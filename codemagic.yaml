@@ -22,6 +22,7 @@ workflows:
           include: true
     scripts:
       - name: Set up code signing
+        working_directory: permuta_app
         script: |
           keychain initialize
           # cria o certificado de distribuição e o provisioning profile se ainda nao existirem
