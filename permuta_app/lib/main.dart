@@ -19,16 +19,16 @@ Future<void> main() async {
     publishableKey: Env.supabaseAnonKey,
   );
 
-  runApp(const ProviderScope(child: PermutaApp()));
+  runApp(const ProviderScope(child: CathiraApp()));
 }
 
-class PermutaApp extends StatelessWidget {
-  const PermutaApp({super.key});
+class CathiraApp extends StatelessWidget {
+  const CathiraApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Permuta',
+      title: 'cathira',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       home: const AuthGate(),

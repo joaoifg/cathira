@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Paleta Permuta — vermelho-coral quente como primary, âmbar como accent,
+/// Paleta cathira — vermelho-coral quente como primary, âmbar como accent,
 /// slate escuro pra ink, fundo creme suave pra dar calor.
 class AppColors {
   static const primary       = Color(0xFFF43F5E); // rose-500 mais vibrante
@@ -180,17 +180,19 @@ class AppTheme {
   }
 
   static TextTheme _textTheme(TextTheme base) {
+    // Display: Space Grotesk (mais tech, condensada).
+    // Body / labels: Plus Jakarta Sans (humana, legível).
     return GoogleFonts.plusJakartaSansTextTheme(base).copyWith(
-      displayLarge: GoogleFonts.plusJakartaSans(
-          fontSize: 44, fontWeight: FontWeight.w800, color: AppColors.ink, letterSpacing: -0.8),
-      displayMedium: GoogleFonts.plusJakartaSans(
-          fontSize: 36, fontWeight: FontWeight.w800, color: AppColors.ink, letterSpacing: -0.6),
-      displaySmall: GoogleFonts.plusJakartaSans(
-          fontSize: 30, fontWeight: FontWeight.w800, color: AppColors.ink, letterSpacing: -0.5),
-      headlineMedium: GoogleFonts.plusJakartaSans(
-          fontSize: 24, fontWeight: FontWeight.w800, color: AppColors.ink, letterSpacing: -0.3),
-      titleLarge: GoogleFonts.plusJakartaSans(
-          fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.ink),
+      displayLarge: GoogleFonts.spaceGrotesk(
+          fontSize: 48, fontWeight: FontWeight.w700, color: AppColors.ink, letterSpacing: -2.2, height: 0.95),
+      displayMedium: GoogleFonts.spaceGrotesk(
+          fontSize: 40, fontWeight: FontWeight.w700, color: AppColors.ink, letterSpacing: -1.8, height: 0.98),
+      displaySmall: GoogleFonts.spaceGrotesk(
+          fontSize: 32, fontWeight: FontWeight.w700, color: AppColors.ink, letterSpacing: -1.2, height: 1.0),
+      headlineMedium: GoogleFonts.spaceGrotesk(
+          fontSize: 26, fontWeight: FontWeight.w700, color: AppColors.ink, letterSpacing: -0.8),
+      titleLarge: GoogleFonts.spaceGrotesk(
+          fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.ink, letterSpacing: -0.4),
       titleMedium: GoogleFonts.plusJakartaSans(
           fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.ink),
       bodyLarge: GoogleFonts.plusJakartaSans(
@@ -203,8 +205,30 @@ class AppTheme {
           fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.ink),
       labelMedium: GoogleFonts.plusJakartaSans(
           fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.muted),
-      labelSmall: GoogleFonts.plusJakartaSans(
-          fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.muted, letterSpacing: 0.4),
+      labelSmall: GoogleFonts.spaceGrotesk(
+          fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.muted, letterSpacing: 1.4),
+    );
+  }
+
+  /// Helper pra usar Space Grotesk inline em widgets específicos.
+  static TextStyle display(double size, {Color? color, FontWeight? weight, double? letter}) {
+    return GoogleFonts.spaceGrotesk(
+      fontSize: size,
+      fontWeight: weight ?? FontWeight.w700,
+      color: color ?? AppColors.ink,
+      letterSpacing: letter ?? -(size * 0.04),
+      height: 0.98,
+    );
+  }
+
+  /// Tabular numerals pra números financeiros (alinham coluna).
+  static TextStyle mono(double size, {Color? color, FontWeight? weight}) {
+    return GoogleFonts.spaceGrotesk(
+      fontSize: size,
+      fontWeight: weight ?? FontWeight.w700,
+      color: color ?? AppColors.ink,
+      letterSpacing: -0.4,
+      fontFeatures: const [FontFeature.tabularFigures()],
     );
   }
 }

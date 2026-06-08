@@ -69,7 +69,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       await ref.read(supabaseClientProvider).auth.signInWithOAuth(
             OAuthProvider.google,
-            redirectTo: 'io.supabase.permuta://login-callback/',
+            redirectTo: 'app.cathira://login-callback/',
           );
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -102,34 +102,44 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             final right = _ctaCard(context);
 
             if (wide) {
-              return Padding(
-                padding: const EdgeInsets.fromLTRB(48, 32, 48, 32),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(flex: 6, child: left),
-                    const SizedBox(width: 56),
-                    Expanded(
-                      flex: 5,
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 440),
-                          child: right,
+              return Stack(
+                children: [
+                  _backgroundDecor(),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(56, 36, 56, 36),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(flex: 6, child: left),
+                        const SizedBox(width: 56),
+                        Expanded(
+                          flex: 5,
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 440),
+                              child: right,
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               );
             }
 
-            return ListView(
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+            return Stack(
               children: [
-                left,
-                const SizedBox(height: 28),
-                right,
+                _backgroundDecor(),
+                ListView(
+                  padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+                  children: [
+                    left,
+                    const SizedBox(height: 28),
+                    right,
+                  ],
+                ),
               ],
             );
           },
@@ -138,28 +148,69 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // Coluna esquerda: identidade visual + manchete + peça gráfica
-  // ─────────────────────────────────────────────────────────────
+  /// Pequenos detalhes geométricos atrás do conteúdo — dá movimento sem competir.
+  Widget _backgroundDecor() {
+    return IgnorePointer(
+      child: Stack(
+        children: [
+          // Linha gradiente no topo, estilo Stripe.
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 3,
+              decoration: const BoxDecoration(gradient: AppColors.gradHero),
+            ),
+          ),
+          // Grid de pontos sutil no canto inferior direito.
+          Positioned(
+            bottom: 24,
+            right: 24,
+            child: Opacity(
+              opacity: 0.35,
+              child: CustomPaint(
+                size: const Size(160, 160),
+                painter: _DotGridPainter(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ─── Coluna esquerda: identidade + manchete + peça gráfica
   Widget _editorial(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _logoLockup(),
-        const SizedBox(height: 56),
+        const SizedBox(height: 64),
         _headline(),
-        const SizedBox(height: 22),
+        const SizedBox(height: 24),
         SizedBox(
-          width: 480,
-          child: Text(
-            'Você monta um lote com vários ativos, alguém monta o dela, '
-            'e a torna sai calculada em tempo real. Sem mensagem amadora, '
-            'sem item por item.',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: AppColors.muted,
-                  height: 1.55,
-                  fontSize: 16,
+          width: 500,
+          child: RichText(
+            text: TextSpan(
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: AppColors.muted,
+                    height: 1.55,
+                    fontSize: 16,
+                  ),
+              children: const [
+                TextSpan(
+                  text: 'Carro + bike + console',
+                  style: TextStyle(
+                    color: AppColors.ink,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
+                TextSpan(
+                    text:
+                        ' viram um lote só. O outro lado monta o dele. A torna sai calculada na hora — sem amadorismo, sem item por item.'),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 40),
@@ -172,51 +223,40 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Widget _logoLockup() {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
-          width: 40,
-          height: 40,
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
           decoration: BoxDecoration(
-            gradient: AppColors.gradHero,
-            borderRadius: BorderRadius.circular(11),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.35),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: const Center(
-            child: Icon(Icons.sync_alt_rounded,
-                color: Colors.white, size: 20),
-          ),
-        ),
-        const SizedBox(width: 12),
-        const Text(
-          'Permuta',
-          style: TextStyle(
             color: AppColors.ink,
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
-            letterSpacing: -0.3,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-          decoration: BoxDecoration(
-            color: AppColors.ink.withValues(alpha: 0.07),
-            borderRadius: BorderRadius.circular(100),
+            borderRadius: BorderRadius.circular(12),
           ),
           child: const Text(
-            'BETA',
+            'c',
             style: TextStyle(
-              color: AppColors.muted,
-              fontSize: 9,
+              color: Colors.white,
+              fontSize: 22,
               fontWeight: FontWeight.w900,
-              letterSpacing: 1.4,
+              height: 1,
+              letterSpacing: -1,
             ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          'cathira',
+          style: AppTheme.display(22, weight: FontWeight.w700, letter: -1.2),
+        ),
+        const SizedBox(width: 8),
+        // pulsing dot
+        _PulsingDot(color: AppColors.success),
+        const SizedBox(width: 6),
+        Text(
+          'BETA 0.1',
+          style: AppTheme.mono(10).copyWith(
+            color: AppColors.muted,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.5,
           ),
         ),
       ],
@@ -224,40 +264,67 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Widget _headline() {
-    return RichText(
-      text: TextSpan(
-        style: const TextStyle(
-          color: AppColors.ink,
-          fontWeight: FontWeight.w800,
-          fontSize: 52,
-          height: 1.04,
-          letterSpacing: -2,
-        ),
-        children: [
-          const TextSpan(text: 'Troque '),
-          TextSpan(
-            text: 'tudo. ',
-            style: TextStyle(
-              foreground: Paint()
-                ..shader = const LinearGradient(
-                  colors: [Color(0xFFF43F5E), Color(0xFFF59E0B)],
-                ).createShader(const Rect.fromLTWH(0, 0, 320, 80)),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // eyebrow — etimologia, marca a identidade brasileira raiz.
+        Row(
+          children: [
+            Container(
+              width: 24,
+              height: 2,
+              decoration: const BoxDecoration(
+                color: AppColors.primary,
+              ),
             ),
+            const SizedBox(width: 10),
+            Text(
+              'CATHIRA  ·  DANÇA DE RODA  ·  TROCA DE LANCE',
+              style: AppTheme.mono(10, color: AppColors.muted)
+                  .copyWith(fontWeight: FontWeight.w800, letterSpacing: 2.2),
+            ),
+          ],
+        ),
+        const SizedBox(height: 22),
+        // Manchete principal.
+        RichText(
+          text: TextSpan(
+            style: AppTheme.display(64, weight: FontWeight.w700, letter: -3.2),
+            children: [
+              const TextSpan(text: 'abre a '),
+              TextSpan(
+                text: 'roda.',
+                style: TextStyle(
+                  foreground: Paint()
+                    ..shader = const LinearGradient(
+                      colors: [Color(0xFFF43F5E), Color(0xFFFB923C)],
+                    ).createShader(const Rect.fromLTWH(0, 0, 320, 100)),
+                ),
+              ),
+              const TextSpan(text: '\ntroca '),
+              TextSpan(
+                text: 'tudo.',
+                style: TextStyle(
+                  foreground: Paint()
+                    ..shader = const LinearGradient(
+                      colors: [Color(0xFFF59E0B), Color(0xFFF43F5E)],
+                    ).createShader(const Rect.fromLTWH(0, 0, 280, 100)),
+                ),
+              ),
+            ],
           ),
-          const TextSpan(text: '\nEqualize\n'),
-          const TextSpan(text: 'na hora.'),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   Widget _socialProof() {
     return Row(
-      children: const [
+      children: [
         _ProofStat(value: '7', label: 'setores'),
-        SizedBox(width: 28),
+        const _ProofDivider(),
         _ProofStat(value: 'R\$ 11M+', label: 'em catálogo'),
-        SizedBox(width: 28),
+        const _ProofDivider(),
         _ProofStat(value: '70+', label: 'permutadores'),
       ],
     );
@@ -265,7 +332,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Widget _pecaGrafica() {
     return SizedBox(
-      height: 240,
+      height: 260,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -305,10 +372,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               rot: 0.10,
             ),
           ),
-          // bolha "= 1 lote"
           Positioned(
             right: -8,
-            top: 90,
+            top: 100,
             child: Container(
               padding:
                   const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -317,16 +383,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 borderRadius: BorderRadius.circular(14),
                 boxShadow: AppShadows.lift,
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('= 1 lote',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 13)),
-                  SizedBox(width: 6),
-                  Icon(Icons.bolt_rounded,
+                  Text(
+                    '= 1 lote',
+                    style: AppTheme.mono(13,
+                            color: Colors.white,
+                            weight: FontWeight.w800)
+                        .copyWith(letterSpacing: -0.4),
+                  ),
+                  const SizedBox(width: 6),
+                  const Icon(Icons.bolt_rounded,
                       color: AppColors.accent, size: 16),
                 ],
               ),
@@ -378,11 +446,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             const SizedBox(height: 2),
             Text(
               valor,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.9),
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-              ),
+              style: AppTheme.mono(12,
+                  color: Colors.white.withValues(alpha: 0.95)),
             ),
           ],
         ),
@@ -390,16 +455,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // Coluna direita: card com formulário de auth
-  // ─────────────────────────────────────────────────────────────
+  // ─── Coluna direita: card com formulário de auth
   Widget _ctaCard(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: AppColors.ink.withValues(alpha: 0.07)),
+        border: Border.all(color: AppColors.ink.withValues(alpha: 0.06)),
         boxShadow: AppShadows.soft,
       ),
       child: Column(
@@ -407,11 +470,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            _waitingOtp ? 'Confirme o código' : 'Entrar',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
-                ),
+            _waitingOtp ? 'confirme o código' : 'entrar',
+            style: AppTheme.display(26, weight: FontWeight.w700, letter: -0.8),
           ),
           const SizedBox(height: 4),
           Text(
@@ -451,26 +511,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: const Text('Entrar'),
             ),
             TextButton(
-              onPressed: _loading
-                  ? null
-                  : () => setState(() => _waitingOtp = false),
+              onPressed:
+                  _loading ? null : () => setState(() => _waitingOtp = false),
               child: const Text('Trocar telefone'),
             ),
           ],
           const SizedBox(height: 18),
           Row(
             children: [
-              Expanded(child: Divider(color: AppColors.ink.withValues(alpha: 0.08))),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: Text('ou',
-                    style: TextStyle(
-                        color: AppColors.muted,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1)),
+              Expanded(
+                  child: Divider(color: AppColors.ink.withValues(alpha: 0.08))),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Text(
+                  'ou',
+                  style: AppTheme.mono(11,
+                      color: AppColors.muted, weight: FontWeight.w700),
+                ),
               ),
-              Expanded(child: Divider(color: AppColors.ink.withValues(alpha: 0.08))),
+              Expanded(
+                  child: Divider(color: AppColors.ink.withValues(alpha: 0.08))),
             ],
           ),
           const SizedBox(height: 14),
@@ -487,8 +547,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               decoration: BoxDecoration(
                 color: AppColors.surfaceAlt,
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                    color: AppColors.ink.withValues(alpha: 0.06)),
+                border:
+                    Border.all(color: AppColors.ink.withValues(alpha: 0.06)),
               ),
               child: Row(
                 children: [
@@ -510,7 +570,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             style: TextStyle(
                                 fontWeight: FontWeight.w800, fontSize: 12.5)),
                         Text(
-                          'Token fake sem SMS/Google. Sem realtime.',
+                          'Token fake sem SMS/Google.',
                           style: TextStyle(
                               color: AppColors.muted,
                               fontSize: 10.5,
@@ -564,8 +624,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ],
           const SizedBox(height: 16),
           Text(
-            'Ao entrar você concorda com nossos termos. '
-            'A torna é referência, ajuste no chat.',
+            'Ao entrar você concorda com nossos termos. A torna é referência — ajuste no chat.',
             style: TextStyle(
               color: AppColors.muted.withValues(alpha: 0.8),
               fontSize: 11,
@@ -588,26 +647,98 @@ class _ProofStat extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          value,
-          style: const TextStyle(
-            color: AppColors.ink,
-            fontWeight: FontWeight.w900,
-            fontSize: 22,
-            letterSpacing: -0.5,
-          ),
-        ),
+        Text(value, style: AppTheme.display(22, weight: FontWeight.w700)),
         const SizedBox(height: 2),
         Text(
           label,
-          style: const TextStyle(
-            color: AppColors.muted,
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.4,
-          ),
+          style: AppTheme.mono(10, color: AppColors.muted)
+              .copyWith(fontWeight: FontWeight.w800, letterSpacing: 1.2),
         ),
       ],
     );
   }
+}
+
+class _ProofDivider extends StatelessWidget {
+  const _ProofDivider();
+  @override
+  Widget build(BuildContext context) => Container(
+        width: 1,
+        height: 32,
+        margin: const EdgeInsets.symmetric(horizontal: 24),
+        color: AppColors.ink.withValues(alpha: 0.12),
+      );
+}
+
+class _PulsingDot extends StatefulWidget {
+  const _PulsingDot({required this.color});
+  final Color color;
+  @override
+  State<_PulsingDot> createState() => _PulsingDotState();
+}
+
+class _PulsingDotState extends State<_PulsingDot>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _ctrl,
+      builder: (_, __) {
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: 14,
+              height: 14,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: widget.color.withValues(alpha: 0.25 * (1 - _ctrl.value)),
+              ),
+            ),
+            Container(
+              width: 7,
+              height: 7,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: widget.color,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _DotGridPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = AppColors.ink.withValues(alpha: 0.18);
+    const step = 14.0;
+    for (double x = 0; x < size.width; x += step) {
+      for (double y = 0; y < size.height; y += step) {
+        canvas.drawCircle(Offset(x, y), 1.2, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

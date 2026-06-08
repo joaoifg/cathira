@@ -244,13 +244,13 @@ class HomeScreen extends ConsumerWidget {
 
   Widget _comoFunciona(BuildContext ctx) {
     final passos = [
-      ('📦', 'Monta um lote',
-          'Junta 1, 2 ou 10 itens — você decide.'),
-      ('🔍', 'Recebe sugestões',
-          'Outros lotes próximos do seu valor.'),
-      ('⚖️', 'Mesa ao vivo',
-          'Itens entram e saem, torna recalcula sozinha.'),
-      ('🤝', 'Aceitam e fecham', 'Os dois confirmam, virou compromisso.'),
+      ('📦', 'monta um lote',
+          'Junta 1, 2 ou 10 itens — você decide o que entra.'),
+      ('🔥', 'descobre',
+          'Lotes na sua faixa de valor aparecem no feed.'),
+      ('⚖️', 'mesa ao vivo',
+          'Adiciona ou tira item, torna recalcula sozinha.'),
+      ('🤝', 'aceita e fecha', 'Os dois confirmam — virou compromisso.'),
     ];
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
@@ -263,19 +263,30 @@ class HomeScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Como funciona',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -0.4),
+            Row(
+              children: [
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.accent,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  'COMO FUNCIONA',
+                  style: AppTheme.mono(10,
+                          color: AppColors.accent, weight: FontWeight.w800)
+                      .copyWith(letterSpacing: 1.6),
+                ),
+              ],
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 10),
             Text(
-              'Quatro passos. Sem mistério.',
-              style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.7), fontSize: 13.5),
+              'quatro passos.\nsem mistério.',
+              style: AppTheme.display(28,
+                  color: Colors.white, weight: FontWeight.w700, letter: -1.2),
             ),
             const SizedBox(height: 18),
             ...passos.asMap().entries.map((e) {
@@ -286,22 +297,15 @@ class HomeScreen extends ConsumerWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
+                    SizedBox(
                       width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Center(
-                        child: Text('$n',
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w900,
-                                fontSize: 13)),
+                      child: Text(
+                        '0$n',
+                        style: AppTheme.mono(14,
+                            color: AppColors.accent, weight: FontWeight.w800),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 8),
                     Text(p.$1, style: const TextStyle(fontSize: 18)),
                     const SizedBox(width: 10),
                     Expanded(
@@ -309,10 +313,11 @@ class HomeScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(p.$2,
-                              style: const TextStyle(
+                              style: AppTheme.display(15,
                                   color: Colors.white,
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 14)),
+                                  weight: FontWeight.w700,
+                                  letter: -0.4)),
+                          const SizedBox(height: 1),
                           Text(p.$3,
                               style: TextStyle(
                                   color:
@@ -357,44 +362,90 @@ class _Saudacao extends ConsumerWidget {
                 ? '👋'
                 : '🌆';
     final saudacao = hora < 6
-        ? 'Boa madrugada'
+        ? 'boa madrugada'
         : hora < 12
-            ? 'Bom dia'
+            ? 'bom dia'
             : hora < 18
-                ? 'Boa tarde'
-                : 'Boa noite';
+                ? 'boa tarde'
+                : 'boa noite';
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Branding bar com pulsing dot
           Row(
             children: [
-              Text(
-                emoji,
-                style: const TextStyle(fontSize: 22),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
+                decoration: BoxDecoration(
+                  color: AppColors.ink,
+                  borderRadius: BorderRadius.circular(7),
+                ),
+                child: const Text(
+                  'c',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w900,
+                    height: 1,
+                    letterSpacing: -0.5,
+                  ),
+                ),
               ),
               const SizedBox(width: 6),
-              Text(
-                '$saudacao${nome.isNotEmpty ? ", $nome" : ""}',
-                style: const TextStyle(
-                  color: AppColors.muted,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14,
+              Text('cathira',
+                  style: AppTheme.display(15,
+                      weight: FontWeight.w700, letter: -0.8)),
+              const SizedBox(width: 8),
+              Container(
+                width: 5,
+                height: 5,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.success,
                 ),
+              ),
+              const SizedBox(width: 5),
+              Text(
+                'AO VIVO',
+                style: AppTheme.mono(9, color: AppColors.muted)
+                    .copyWith(fontWeight: FontWeight.w800, letterSpacing: 1.2),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          const Text(
-            'Topa uma troca\nhoje?',
-            style: TextStyle(
-              color: AppColors.ink,
-              fontWeight: FontWeight.w800,
-              fontSize: 36,
-              height: 1.05,
-              letterSpacing: -1.2,
+          const SizedBox(height: 18),
+          Row(
+            children: [
+              Text(emoji, style: const TextStyle(fontSize: 18)),
+              const SizedBox(width: 6),
+              Text(
+                '$saudacao${nome.isNotEmpty ? ", $nome" : ""}',
+                style: AppTheme.mono(11, color: AppColors.muted)
+                    .copyWith(fontWeight: FontWeight.w800, letterSpacing: 1.4),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          RichText(
+            text: TextSpan(
+              style: AppTheme.display(40,
+                  weight: FontWeight.w700, letter: -1.8),
+              children: [
+                const TextSpan(text: 'abre a '),
+                TextSpan(
+                  text: 'roda.',
+                  style: TextStyle(
+                    foreground: Paint()
+                      ..shader = const LinearGradient(
+                        colors: [Color(0xFFF43F5E), Color(0xFFFB923C)],
+                      ).createShader(const Rect.fromLTWH(0, 0, 200, 60)),
+                  ),
+                ),
+                const TextSpan(text: '\nhoje tem lote\nnovo no feed.'),
+              ],
             ),
           ),
         ],
@@ -420,22 +471,13 @@ class _StatLine extends StatelessWidget {
         children: [
           Text(
             value,
-            style: TextStyle(
-              color: cor,
-              fontSize: 19,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -0.5,
-            ),
+            style: AppTheme.mono(20, color: cor, weight: FontWeight.w700),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 3),
           Text(
             label,
-            style: const TextStyle(
-              color: AppColors.muted,
-              fontSize: 10.5,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.4,
-            ),
+            style: AppTheme.mono(10, color: AppColors.muted)
+                .copyWith(fontWeight: FontWeight.w800, letterSpacing: 1.2),
           ),
         ],
       ),
@@ -468,12 +510,8 @@ class _SectionTitle extends StatelessWidget {
               children: [
                 Text(
                   titulo,
-                  style: const TextStyle(
-                    color: AppColors.ink,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.4,
-                  ),
+                  style:
+                      AppTheme.display(22, weight: FontWeight.w700, letter: -0.8),
                 ),
                 if (subtitulo != null)
                   Padding(
@@ -610,13 +648,10 @@ class _HeroLoteCard extends StatelessWidget {
                     lote.titulo,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 26,
-                      height: 1.1,
-                      letterSpacing: -0.6,
-                    ),
+                    style: AppTheme.display(28,
+                        color: Colors.white,
+                        weight: FontWeight.w700,
+                        letter: -1.2),
                   ),
                   const SizedBox(height: 8),
                   Row(
@@ -646,12 +681,9 @@ class _HeroLoteCard extends StatelessWidget {
                       const Spacer(),
                       Text(
                         brl(lote.valorTotal),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 22,
-                          letterSpacing: -0.5,
-                        ),
+                        style: AppTheme.mono(22,
+                            color: Colors.white,
+                            weight: FontWeight.w700),
                       ),
                     ],
                   ),
@@ -725,11 +757,8 @@ class _MiniLoteCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                   brl(lote.valorTotal),
-                  style: const TextStyle(
-                    color: AppColors.success,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 15,
-                  ),
+                  style: AppTheme.mono(15,
+                      color: AppColors.success, weight: FontWeight.w700),
                 ),
               ],
             ),
