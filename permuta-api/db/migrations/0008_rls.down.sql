@@ -1,0 +1,28 @@
+alter table avaliacoes  disable row level security;
+alter table mensagens   disable row level security;
+alter table negociacoes disable row level security;
+alter table swipes      disable row level security;
+alter table itens       disable row level security;
+alter table lotes       disable row level security;
+alter table setores     disable row level security;
+alter table profiles    disable row level security;
+
+drop policy if exists "autor cria avaliacao apos troca aceita" on avaliacoes;
+drop policy if exists "avaliacoes publicas para leitura"       on avaliacoes;
+drop policy if exists "participantes enviam mensagens"         on mensagens;
+drop policy if exists "participantes veem mensagens"           on mensagens;
+drop policy if exists "participantes veem negociacao"          on negociacoes;
+drop policy if exists "autor cria swipe"                       on swipes;
+drop policy if exists "autor ve proprios swipes"               on swipes;
+drop policy if exists "dono apaga item"                        on itens;
+drop policy if exists "dono edita item"                        on itens;
+drop policy if exists "dono cria item"                         on itens;
+drop policy if exists "itens visiveis a todos"                 on itens;
+drop policy if exists "dono apaga seu lote"                    on lotes;
+drop policy if exists "dono edita seu lote"                    on lotes;
+drop policy if exists "dono cria lote"                         on lotes;
+drop policy if exists "lotes visiveis a todos"                 on lotes;
+drop policy if exists "setores publicos"                       on setores;
+drop policy if exists "dono cria proprio perfil"               on profiles;
+drop policy if exists "dono edita proprio perfil"              on profiles;
+drop policy if exists "profiles publicos para leitura"         on profiles;

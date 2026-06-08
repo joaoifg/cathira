@@ -1,0 +1,32 @@
+# Segredos — nunca commitar
+*.env
+.env
+.env.*
+!.env.example
+*.p8
+*.mobileprovision
+*.p12
+*.cer
+
+# Flutter
+permuta_app/build/
+permuta_app/.dart_tool/
+permuta_app/.flutter-plugins
+permuta_app/.flutter-plugins-dependencies
+permuta_app/ios/Pods/
+permuta_app/ios/.symlinks/
+permuta_app/ios/Flutter/Flutter.framework
+permuta_app/ios/Flutter/Flutter.podspec
+permuta_app/.gradle/
+
+# Go
+permuta-api/bin/
+permuta-api/dist/
+permuta-api/tmp/
+*.exe
+
+# Editores / SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,62 @@
+workflows:
+  ios-testflight:
+    name: Permuta iOS → TestFlight
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+      groups:
+        - permuta_env          # SUPABASE_URL, SUPABASE_ANON_KEY, API_BASE_URL
+      vars:
+        BUNDLE_ID: "com.permuta.permutaApp"
+        APP_STORE_APPLE_ID: 0000000000   # troque pelo Apple ID numérico do app (App Store Connect → App Information)
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.permuta.permutaApp
+    integrations:
+      app_store_connect: permuta_appstore   # nome da integração que você criou no Codemagic
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+    scripts:
+      - name: Set up code signing
+        script: |
+          xcode-project use-profiles
+      - name: Flutter packages get
+        working_directory: permuta_app
+        script: |
+          flutter packages pub get
+      - name: Pod install
+        working_directory: permuta_app/ios
+        script: |
+          pod install
+      - name: Build IPA
+        working_directory: permuta_app
+        script: |
+          BUILD_NUMBER=$(($(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID" --quiet 2>/dev/null || echo 0) + 1))
+          flutter build ipa --release \
+            --build-number=$BUILD_NUMBER \
+            --dart-define=SUPABASE_URL=$SUPABASE_URL \
+            --dart-define=SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY \
+            --dart-define=API_BASE_URL=$API_BASE_URL \
+            --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - permuta_app/build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        # beta_groups:                 # descomente se quiser distribuir pra um grupo de testers
+        #   - Internos
+      email:
+        recipients:
+          - joaohenriqueoci@gmail.com
+        notify:
+          success: true
+          failure: true

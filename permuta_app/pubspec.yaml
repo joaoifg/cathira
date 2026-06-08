@@ -1,0 +1,44 @@
+name: permuta_app
+description: "Permuta — marketplace de troca de lotes."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # Estado
+  flutter_riverpod: ^2.5.1
+
+  # Supabase (auth + realtime + storage)
+  supabase_flutter: ^2.5.6
+
+  # HTTP para a Go API
+  dio: ^5.4.0
+
+  # Navegação
+  go_router: ^14.0.0
+
+  # Localização / cidade
+  geolocator: ^11.0.0
+
+  # Utilitários
+  intl: ^0.19.0
+
+  # Upload de fotos dos itens
+  image_picker: ^1.1.2
+
+  # Tipografia
+  google_fonts: ^6.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
