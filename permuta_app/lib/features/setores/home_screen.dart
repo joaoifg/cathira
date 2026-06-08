@@ -8,6 +8,7 @@ import '../../features/auth/dev_auth.dart';
 import '../../shared/models/models.dart';
 import '../../shared/providers/data_providers.dart';
 import '../../shared/widgets/brl.dart';
+import '../../shared/widgets/cathira_glyph.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -243,6 +244,38 @@ class HomeScreen extends ConsumerWidget {
   }
 
   Widget _comoFunciona(BuildContext ctx) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: AppColors.gradInk,
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: Stack(
+            children: [
+              // Stamp decorativo no canto (vibe serigrafia).
+              Positioned(
+                right: -20,
+                top: -20,
+                child: Opacity(
+                  opacity: 0.10,
+                  child: CathiraStamp(size: 180, color: Colors.white),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 22, 24, 22),
+                child: _comoFuncionaInner(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _comoFuncionaInner() {
     final passos = [
       ('📦', 'monta um lote',
           'Junta 1, 2 ou 10 itens — você decide o que entra.'),
@@ -252,15 +285,7 @@ class HomeScreen extends ConsumerWidget {
           'Adiciona ou tira item, torna recalcula sozinha.'),
       ('🤝', 'aceita e fecha', 'Os dois confirmam — virou compromisso.'),
     ];
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(24, 22, 24, 22),
-        decoration: BoxDecoration(
-          gradient: AppColors.gradInk,
-          borderRadius: BorderRadius.circular(24),
-        ),
-        child: Column(
+    return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
@@ -332,9 +357,7 @@ class HomeScreen extends ConsumerWidget {
               );
             }),
           ],
-        ),
-      ),
-    );
+        );
   }
 }
 
@@ -377,28 +400,11 @@ class _Saudacao extends ConsumerWidget {
           // Branding bar com pulsing dot
           Row(
             children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
-                decoration: BoxDecoration(
-                  color: AppColors.ink,
-                  borderRadius: BorderRadius.circular(7),
-                ),
-                child: const Text(
-                  'c',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w900,
-                    height: 1,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 6),
+              const CathiraGlyph(size: 22, color: AppColors.ink),
+              const SizedBox(width: 7),
               Text('cathira',
-                  style: AppTheme.display(15,
-                      weight: FontWeight.w700, letter: -0.8)),
+                  style: AppTheme.display(16,
+                      weight: FontWeight.w700, letter: -1.0)),
               const SizedBox(width: 8),
               Container(
                 width: 5,

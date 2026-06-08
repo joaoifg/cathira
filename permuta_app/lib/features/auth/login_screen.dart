@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/env/env.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../core/theme/app_theme.dart';
+import '../../shared/widgets/cathira_glyph.dart';
 import 'dev_auth.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -225,27 +226,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-          decoration: BoxDecoration(
-            color: AppColors.ink,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Text(
-            'c',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.w900,
-              height: 1,
-              letterSpacing: -1,
-            ),
-          ),
-        ),
+        const CathiraGlyph(size: 34, color: AppColors.ink),
         const SizedBox(width: 10),
         Text(
           'cathira',
-          style: AppTheme.display(22, weight: FontWeight.w700, letter: -1.2),
+          style: AppTheme.display(24, weight: FontWeight.w700, letter: -1.6),
         ),
         const SizedBox(width: 8),
         // pulsing dot
@@ -393,10 +378,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             weight: FontWeight.w800)
                         .copyWith(letterSpacing: -0.4),
                   ),
-                  const SizedBox(width: 6),
-                  const Icon(Icons.bolt_rounded,
-                      color: AppColors.accent, size: 16),
+                  const SizedBox(width: 8),
+                  CathiraGlyph(
+                    size: 16,
+                    gradient: const LinearGradient(
+                      colors: [AppColors.primary, AppColors.accent],
+                    ),
+                  ),
                 ],
+              ),
+            ),
+          ),
+          // Carimbo serigrafia no canto.
+          Positioned(
+            right: -28,
+            bottom: -10,
+            child: Opacity(
+              opacity: 0.18,
+              child: Transform.rotate(
+                angle: -0.12,
+                child: const CathiraStamp(size: 140),
               ),
             ),
           ),
