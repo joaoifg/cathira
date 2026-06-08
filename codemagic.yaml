@@ -16,7 +16,7 @@ workflows:
         distribution_type: app_store
         bundle_identifier: com.permuta.permutaApp
     integrations:
-      app_store_connect: permuta_appstore   # nome da integração que você criou no Codemagic
+      app_store_connect: Futhe Apple Key   # nome da chave já conectada no Codemagic (mesma conta Apple)
     triggering:
       events:
         - push
