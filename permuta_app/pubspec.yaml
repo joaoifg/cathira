@@ -1,7 +1,7 @@
 name: permuta_app
-description: "Permuta — marketplace de troca de lotes."
+description: "cathira — marketplace de permuta com torna automática."
 publish_to: 'none'
-version: 0.1.0+1
+version: 0.2.0+1
 
 environment:
   sdk: ^3.8.1
