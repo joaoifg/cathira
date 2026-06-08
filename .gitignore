@@ -7,6 +7,8 @@
 *.mobileprovision
 *.p12
 *.cer
+*.pem
+codesign_key.pem
 
 # Flutter
 permuta_app/build/
