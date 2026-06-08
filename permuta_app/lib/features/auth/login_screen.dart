@@ -358,7 +358,148 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
             ),
           ),
+          SizedBox(height: 22 * scale.clamp(1, 1.2)),
+          _miniLotesFan(scale: scale),
         ],
+      ),
+    );
+  }
+
+  /// 3 mini-cards de lote em fan rotacionado — comunica visualmente
+  /// "vários ativos viram 1 lote". Reativado a pedido.
+  Widget _miniLotesFan({required double scale}) {
+    final w = 140.0 * scale.clamp(1, 1.15);
+    final h = 180.0 * scale.clamp(1, 1.15);
+    return SizedBox(
+      height: h + 50,
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+          Positioned(
+            left: -(w * 0.55),
+            top: 20,
+            child: _miniLote(
+              w: w,
+              h: h,
+              emoji: '🚗',
+              titulo: 'Civic EXL',
+              valor: 'R\$ 95.000',
+              cor1: const Color(0xFFDC2626),
+              cor2: const Color(0xFFEF4444),
+              rot: -0.12,
+            ),
+          ),
+          _miniLote(
+            w: w,
+            h: h,
+            emoji: '🎸',
+            titulo: 'Les Paul Studio',
+            valor: 'R\$ 9.800',
+            cor1: const Color(0xFF7C3AED),
+            cor2: const Color(0xFFA855F7),
+            rot: 0.0,
+          ),
+          Positioned(
+            right: -(w * 0.55),
+            top: 28,
+            child: _miniLote(
+              w: w,
+              h: h,
+              emoji: '🏕️',
+              titulo: 'Camping',
+              valor: 'R\$ 2.250',
+              cor1: const Color(0xFF059669),
+              cor2: const Color(0xFF10B981),
+              rot: 0.14,
+            ),
+          ),
+          // Badge "= 1 lote" pendurado embaixo.
+          Positioned(
+            bottom: -6,
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(100),
+                boxShadow: AppShadows.lift,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CathiraGlyph(
+                    size: 14,
+                    gradient: const LinearGradient(
+                      colors: [AppColors.primary, AppColors.accent],
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    '= 1 lote',
+                    style: AppTheme.mono(12,
+                            color: AppColors.ink, weight: FontWeight.w800)
+                        .copyWith(letterSpacing: -0.2),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _miniLote({
+    required double w,
+    required double h,
+    required String emoji,
+    required String titulo,
+    required String valor,
+    required Color cor1,
+    required Color cor2,
+    required double rot,
+  }) {
+    return Transform.rotate(
+      angle: rot,
+      child: Container(
+        width: w,
+        height: h,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [cor1, cor2],
+          ),
+          boxShadow: AppShadows.lift,
+          border: Border.all(
+              color: Colors.white.withValues(alpha: 0.25), width: 1),
+        ),
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(emoji, style: TextStyle(fontSize: w * 0.24)),
+            const Spacer(),
+            Text(
+              titulo,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: w * 0.085,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              valor,
+              style: AppTheme.mono(w * 0.08,
+                  color: Colors.white.withValues(alpha: 0.95)),
+            ),
+          ],
+        ),
       ),
     );
   }
