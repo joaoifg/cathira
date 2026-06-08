@@ -35,10 +35,6 @@ workflows:
         working_directory: permuta_app
         script: |
           flutter packages pub get
-      - name: Pod install
-        working_directory: permuta_app/ios
-        script: |
-          pod install
       - name: Build IPA
         working_directory: permuta_app
         script: |
