@@ -309,9 +309,9 @@ class HomeScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'quatro passos.\nsem mistério.',
+              'mecânica\nda cathira.',
               style: AppTheme.display(28,
-                  color: Colors.white, weight: FontWeight.w700, letter: -1.2),
+                  color: Colors.white, weight: FontWeight.w700, letter: -1.4),
             ),
             const SizedBox(height: 18),
             ...passos.asMap().entries.map((e) {
@@ -437,20 +437,20 @@ class _Saudacao extends ConsumerWidget {
           const SizedBox(height: 10),
           RichText(
             text: TextSpan(
-              style: AppTheme.display(40,
+              style: AppTheme.display(36,
                   weight: FontWeight.w700, letter: -1.8),
               children: [
-                const TextSpan(text: 'abre a '),
+                const TextSpan(text: 'monta o lote.\n'),
                 TextSpan(
-                  text: 'roda.',
+                  text: 'a torna',
                   style: TextStyle(
                     foreground: Paint()
                       ..shader = const LinearGradient(
                         colors: [Color(0xFFF43F5E), Color(0xFFFB923C)],
-                      ).createShader(const Rect.fromLTWH(0, 0, 200, 60)),
+                      ).createShader(const Rect.fromLTWH(0, 0, 220, 50)),
                   ),
                 ),
-                const TextSpan(text: '\nhoje tem lote\nnovo no feed.'),
+                const TextSpan(text: '\nresolve sozinha.'),
               ],
             ),
           ),

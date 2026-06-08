@@ -200,16 +200,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     fontSize: 16,
                   ),
               children: const [
+                TextSpan(text: 'Você junta '),
                 TextSpan(
-                  text: 'Carro + bike + console',
+                  text: 'carro + bike + console',
                   style: TextStyle(
-                    color: AppColors.ink,
-                    fontWeight: FontWeight.w800,
-                  ),
+                      color: AppColors.ink, fontWeight: FontWeight.w800),
                 ),
                 TextSpan(
                     text:
-                        ' viram um lote só. O outro lado monta o dele. A torna sai calculada na hora — sem amadorismo, sem item por item.'),
+                        ' num lote. Acha um lote que valha o seu. A diferença vira torna e sai calculada na hora.'),
               ],
             ),
           ),
@@ -252,21 +251,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // eyebrow — etimologia, marca a identidade brasileira raiz.
+        // eyebrow — categoria do produto.
         Row(
           children: [
             Container(
               width: 24,
               height: 2,
-              decoration: const BoxDecoration(
-                color: AppColors.primary,
-              ),
+              decoration: const BoxDecoration(color: AppColors.primary),
             ),
             const SizedBox(width: 10),
             Text(
-              'CATHIRA  ·  DANÇA DE RODA  ·  TROCA DE LANCE',
+              'MARKETPLACE DE PERMUTA  ·  COM TORNA AUTOMÁTICA',
               style: AppTheme.mono(10, color: AppColors.muted)
-                  .copyWith(fontWeight: FontWeight.w800, letterSpacing: 2.2),
+                  .copyWith(fontWeight: FontWeight.w700, letterSpacing: 2.0),
             ),
           ],
         ),
@@ -274,26 +271,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         // Manchete principal.
         RichText(
           text: TextSpan(
-            style: AppTheme.display(64, weight: FontWeight.w700, letter: -3.2),
+            style: AppTheme.display(54, weight: FontWeight.w700, letter: -3.0),
             children: [
-              const TextSpan(text: 'abre a '),
+              const TextSpan(text: 'não é '),
               TextSpan(
-                text: 'roda.',
+                text: 'troca.',
+                style: TextStyle(
+                  decoration: TextDecoration.lineThrough,
+                  decorationColor: AppColors.primary,
+                  decorationThickness: 3,
+                ),
+              ),
+              const TextSpan(text: '\né '),
+              TextSpan(
+                text: 'cálculo.',
                 style: TextStyle(
                   foreground: Paint()
                     ..shader = const LinearGradient(
                       colors: [Color(0xFFF43F5E), Color(0xFFFB923C)],
-                    ).createShader(const Rect.fromLTWH(0, 0, 320, 100)),
-                ),
-              ),
-              const TextSpan(text: '\ntroca '),
-              TextSpan(
-                text: 'tudo.',
-                style: TextStyle(
-                  foreground: Paint()
-                    ..shader = const LinearGradient(
-                      colors: [Color(0xFFF59E0B), Color(0xFFF43F5E)],
-                    ).createShader(const Rect.fromLTWH(0, 0, 280, 100)),
+                    ).createShader(const Rect.fromLTWH(0, 0, 340, 100)),
                 ),
               ),
             ],

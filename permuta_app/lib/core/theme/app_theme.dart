@@ -180,19 +180,20 @@ class AppTheme {
   }
 
   static TextTheme _textTheme(TextTheme base) {
-    // Display: Space Grotesk (mais tech, condensada).
+    // Display: Unbounded (condensada, poster, identidade brasileira moderna).
     // Body / labels: Plus Jakarta Sans (humana, legível).
+    // Mono labels: JetBrains Mono (tabular figures, vibe técnica).
     return GoogleFonts.plusJakartaSansTextTheme(base).copyWith(
-      displayLarge: GoogleFonts.spaceGrotesk(
-          fontSize: 48, fontWeight: FontWeight.w700, color: AppColors.ink, letterSpacing: -2.2, height: 0.95),
-      displayMedium: GoogleFonts.spaceGrotesk(
-          fontSize: 40, fontWeight: FontWeight.w700, color: AppColors.ink, letterSpacing: -1.8, height: 0.98),
-      displaySmall: GoogleFonts.spaceGrotesk(
-          fontSize: 32, fontWeight: FontWeight.w700, color: AppColors.ink, letterSpacing: -1.2, height: 1.0),
-      headlineMedium: GoogleFonts.spaceGrotesk(
-          fontSize: 26, fontWeight: FontWeight.w700, color: AppColors.ink, letterSpacing: -0.8),
-      titleLarge: GoogleFonts.spaceGrotesk(
-          fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.ink, letterSpacing: -0.4),
+      displayLarge: GoogleFonts.unbounded(
+          fontSize: 46, fontWeight: FontWeight.w700, color: AppColors.ink, letterSpacing: -2.4, height: 0.95),
+      displayMedium: GoogleFonts.unbounded(
+          fontSize: 38, fontWeight: FontWeight.w700, color: AppColors.ink, letterSpacing: -2.0, height: 0.96),
+      displaySmall: GoogleFonts.unbounded(
+          fontSize: 30, fontWeight: FontWeight.w700, color: AppColors.ink, letterSpacing: -1.4, height: 1.0),
+      headlineMedium: GoogleFonts.unbounded(
+          fontSize: 24, fontWeight: FontWeight.w700, color: AppColors.ink, letterSpacing: -1.0),
+      titleLarge: GoogleFonts.unbounded(
+          fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.ink, letterSpacing: -0.6),
       titleMedium: GoogleFonts.plusJakartaSans(
           fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.ink),
       bodyLarge: GoogleFonts.plusJakartaSans(
@@ -205,30 +206,30 @@ class AppTheme {
           fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.ink),
       labelMedium: GoogleFonts.plusJakartaSans(
           fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.muted),
-      labelSmall: GoogleFonts.spaceGrotesk(
-          fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.muted, letterSpacing: 1.4),
+      labelSmall: GoogleFonts.jetBrainsMono(
+          fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.muted, letterSpacing: 1.6),
     );
   }
 
-  /// Helper pra usar Space Grotesk inline em widgets específicos.
+  /// Helper pra usar Unbounded inline (display).
+  /// Unbounded já é bem condensada — letterSpacing default mais agressivo.
   static TextStyle display(double size, {Color? color, FontWeight? weight, double? letter}) {
-    return GoogleFonts.spaceGrotesk(
+    return GoogleFonts.unbounded(
       fontSize: size,
       fontWeight: weight ?? FontWeight.w700,
       color: color ?? AppColors.ink,
-      letterSpacing: letter ?? -(size * 0.04),
-      height: 0.98,
+      letterSpacing: letter ?? -(size * 0.05),
+      height: 0.96,
     );
   }
 
-  /// Tabular numerals pra números financeiros (alinham coluna).
+  /// JetBrains Mono pra números financeiros e labels técnicos (tabular figures).
   static TextStyle mono(double size, {Color? color, FontWeight? weight}) {
-    return GoogleFonts.spaceGrotesk(
+    return GoogleFonts.jetBrainsMono(
       fontSize: size,
       fontWeight: weight ?? FontWeight.w700,
       color: color ?? AppColors.ink,
-      letterSpacing: -0.4,
-      fontFeatures: const [FontFeature.tabularFigures()],
+      letterSpacing: -0.2,
     );
   }
 }
