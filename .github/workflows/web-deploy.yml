@@ -1,0 +1,63 @@
+name: Deploy Flutter Web → GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'permuta_app/**'
+      - '.github/workflows/web-deploy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Get packages
+        working-directory: permuta_app
+        run: flutter pub get
+
+      - name: Build web
+        working-directory: permuta_app
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+        run: |
+          flutter build web --release \
+            --base-href "/cathira/" \
+            --dart-define=SUPABASE_URL="${SUPABASE_URL:-https://hhijyhzhxcndnzevpuoj.supabase.co}" \
+            --dart-define=SUPABASE_ANON_KEY="${SUPABASE_ANON_KEY:-sb_publishable_-S0bPwYo-JBYSxZ8Q_M0bw_g9DKhMSB}" \
+            --dart-define=API_BASE_URL="${API_BASE_URL:-http://localhost:8080}" \
+            --dart-define=DEV_MODE=true
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: permuta_app/build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
