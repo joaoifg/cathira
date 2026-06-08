@@ -210,6 +210,10 @@ GET   /healthz                                 # público
 POST  /dev/login          {nome?, email?}      # devolve JWT HS256
 POST  /dev/seed                                # popula 4 lotes pro user
 POST  /dev/seed-mundo                          # cria 3 personas + lotes
+POST  /dev/seed-massa?lotes=&personas=&min_itens=&max_itens=&fotos_max=
+                                               # gera MILHARES de lotes mockados (1..3
+                                               # fotos picsum/item) em personas bulk;
+                                               # idempotente. default 1500 lotes.
 POST  /dev/upload         (multipart file)     # proxy → Storage
 
 # Autenticadas (Authorization: Bearer <jwt>)
