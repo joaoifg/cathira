@@ -11,7 +11,7 @@ workflows:
         - permuta_env          # SUPABASE_URL, SUPABASE_ANON_KEY, API_BASE_URL
       vars:
         BUNDLE_ID: "com.permuta.permutaApp"
-        APP_STORE_APPLE_ID: 0000000000   # troque pelo Apple ID numérico do app (App Store Connect → App Information)
+        APP_STORE_APPLE_ID: 6777901760   # Apple ID numérico do app (App Store Connect)
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.permuta.permutaApp
