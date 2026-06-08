@@ -46,6 +46,7 @@ workflows:
             --dart-define=SUPABASE_URL=$SUPABASE_URL \
             --dart-define=SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY \
             --dart-define=API_BASE_URL=$API_BASE_URL \
+            --dart-define=DEV_MODE=true \
             --export-options-plist=/Users/builder/export_options.plist
     artifacts:
       - permuta_app/build/ios/ipa/*.ipa
