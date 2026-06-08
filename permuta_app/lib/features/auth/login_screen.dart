@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../core/env/api_url_override.dart';
 import '../../core/env/env.dart';
 import '../../core/supabase/supabase_providers.dart';
 import '../../core/theme/app_theme.dart';
@@ -18,14 +19,17 @@ class LoginScreen extends ConsumerStatefulWidget {
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _phoneCtrl = TextEditingController();
   final _otpCtrl = TextEditingController();
+  final _apiUrlCtrl = TextEditingController();
   bool _waitingOtp = false;
   bool _loading = false;
+  bool _editApiUrl = false;
   String? _err;
 
   @override
   void dispose() {
     _phoneCtrl.dispose();
     _otpCtrl.dispose();
+    _apiUrlCtrl.dispose();
     super.dispose();
   }
 
@@ -85,7 +89,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       await ref.read(devAuthControllerProvider).login(nome: 'Joao Dev');
     } catch (e) {
-      setState(() => _err = 'Dev login falhou: $e');
+      setState(() => _err = 'Dev login falhou: $e\n\nVerifique o IP da API.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -94,202 +98,78 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: AppColors.ink,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (ctx, c) {
-            final wide = c.maxWidth >= 880;
-            final left = _editorial(context);
-            final right = _ctaCard(context);
-
-            if (wide) {
-              return Stack(
-                children: [
-                  _backgroundDecor(),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(56, 36, 56, 36),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(flex: 6, child: left),
-                        const SizedBox(width: 56),
-                        Expanded(
-                          flex: 5,
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: ConstrainedBox(
-                              constraints: const BoxConstraints(maxWidth: 440),
-                              child: right,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            }
-
-            return Stack(
-              children: [
-                _backgroundDecor(),
-                ListView(
-                  padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
-                  children: [
-                    left,
-                    const SizedBox(height: 28),
-                    right,
-                  ],
-                ),
-              ],
-            );
+            final wide = c.maxWidth >= 980;
+            return wide ? _wideLayout(c.maxHeight) : _mobileLayout();
           },
         ),
       ),
     );
   }
 
-  /// Pequenos detalhes geométricos atrás do conteúdo — dá movimento sem competir.
-  Widget _backgroundDecor() {
-    return IgnorePointer(
-      child: Stack(
-        children: [
-          // Linha gradiente no topo, estilo Stripe.
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 3,
-              decoration: const BoxDecoration(gradient: AppColors.gradHero),
-            ),
-          ),
-          // Grid de pontos sutil no canto inferior direito.
-          Positioned(
-            bottom: 24,
-            right: 24,
-            child: Opacity(
-              opacity: 0.35,
-              child: CustomPaint(
-                size: const Size(160, 160),
-                painter: _DotGridPainter(),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ─── Coluna esquerda: identidade + manchete + peça gráfica
-  Widget _editorial(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  // ─── Mobile / web estreito
+  Widget _mobileLayout() {
+    return Stack(
       children: [
-        _logoLockup(),
-        const SizedBox(height: 64),
-        _headline(),
-        const SizedBox(height: 24),
-        SizedBox(
-          width: 500,
-          child: RichText(
-            text: TextSpan(
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: AppColors.muted,
-                    height: 1.55,
-                    fontSize: 16,
-                  ),
-              children: const [
-                TextSpan(text: 'Você junta '),
-                TextSpan(
-                  text: 'carro + bike + console',
-                  style: TextStyle(
-                      color: AppColors.ink, fontWeight: FontWeight.w800),
+        _heroImageCollage(),
+        SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(height: 12),
+                _topBar(light: true),
+                const SizedBox(height: 24),
+                _cathiraLogoBlock(scale: 1.0),
+                const SizedBox(height: 30),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: _ctaCard(),
                 ),
-                TextSpan(
-                    text:
-                        ' num lote. Acha um lote que valha o seu. A diferença vira torna e sai calculada na hora.'),
+                const SizedBox(height: 32),
               ],
             ),
           ),
         ),
-        const SizedBox(height: 40),
-        _socialProof(),
-        const SizedBox(height: 36),
-        _pecaGrafica(),
       ],
     );
   }
 
-  Widget _logoLockup() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
+  // ─── Desktop / web largo
+  Widget _wideLayout(double h) {
+    return Stack(
       children: [
-        const CathiraGlyph(size: 34, color: AppColors.ink),
-        const SizedBox(width: 10),
-        Text(
-          'cathira',
-          style: AppTheme.display(24, weight: FontWeight.w700, letter: -1.6),
-        ),
-        const SizedBox(width: 8),
-        // pulsing dot
-        _PulsingDot(color: AppColors.success),
-        const SizedBox(width: 6),
-        Text(
-          'BETA 0.1',
-          style: AppTheme.mono(10).copyWith(
-            color: AppColors.muted,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1.5,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _headline() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // eyebrow — categoria do produto.
-        Row(
-          children: [
-            Container(
-              width: 24,
-              height: 2,
-              decoration: const BoxDecoration(color: AppColors.primary),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              'MARKETPLACE DE PERMUTA  ·  COM TORNA AUTOMÁTICA',
-              style: AppTheme.mono(10, color: AppColors.muted)
-                  .copyWith(fontWeight: FontWeight.w700, letterSpacing: 2.0),
-            ),
-          ],
-        ),
-        const SizedBox(height: 22),
-        // Manchete principal.
-        RichText(
-          text: TextSpan(
-            style: AppTheme.display(54, weight: FontWeight.w700, letter: -3.0),
+        _heroImageCollage(),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(56, 28, 56, 36),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const TextSpan(text: 'não é '),
-              TextSpan(
-                text: 'troca.',
-                style: TextStyle(
-                  decoration: TextDecoration.lineThrough,
-                  decorationColor: AppColors.primary,
-                  decorationThickness: 3,
+              Expanded(
+                flex: 6,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _topBar(light: true),
+                    const Spacer(),
+                    _cathiraLogoBlock(scale: 1.6),
+                    const SizedBox(height: 12),
+                    _socialProof(),
+                    const Spacer(),
+                  ],
                 ),
               ),
-              const TextSpan(text: '\né '),
-              TextSpan(
-                text: 'cálculo.',
-                style: TextStyle(
-                  foreground: Paint()
-                    ..shader = const LinearGradient(
-                      colors: [Color(0xFFF43F5E), Color(0xFFFB923C)],
-                    ).createShader(const Rect.fromLTWH(0, 0, 340, 100)),
+              const SizedBox(width: 56),
+              Expanded(
+                flex: 5,
+                child: Align(
+                  alignment: Alignment.center,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 440),
+                    child: _ctaCard(),
+                  ),
                 ),
               ),
             ],
@@ -299,101 +179,52 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Widget _socialProof() {
-    return Row(
-      children: [
-        _ProofStat(value: '7', label: 'setores'),
-        const _ProofDivider(),
-        _ProofStat(value: 'R\$ 11M+', label: 'em catálogo'),
-        const _ProofDivider(),
-        _ProofStat(value: '70+', label: 'permutadores'),
-      ],
-    );
-  }
-
-  Widget _pecaGrafica() {
-    return SizedBox(
-      height: 260,
+  // ─── Foto de fundo: collage de 6 imagens picsum + overlay escuro.
+  Widget _heroImageCollage() {
+    const seeds = [
+      'cathira-bg-1',
+      'cathira-bg-2',
+      'cathira-bg-3',
+      'cathira-bg-4',
+      'cathira-bg-5',
+      'cathira-bg-6',
+    ];
+    return Positioned.fill(
       child: Stack(
-        clipBehavior: Clip.none,
+        fit: StackFit.expand,
         children: [
-          Positioned(
-            left: 0,
-            top: 30,
-            child: _miniLote(
-              emoji: '🚗',
-              titulo: 'Civic 2019 EXL',
-              valor: 'R\$ 95.000',
-              cor1: const Color(0xFFDC2626),
-              cor2: const Color(0xFFEF4444),
-              rot: -0.08,
+          GridView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              mainAxisSpacing: 0,
+              crossAxisSpacing: 0,
+              childAspectRatio: 0.85,
+            ),
+            itemCount: seeds.length,
+            itemBuilder: (_, i) => Image.network(
+              'https://picsum.photos/seed/${seeds[i]}/600/700',
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => Container(color: AppColors.ink),
             ),
           ),
-          Positioned(
-            left: 130,
-            top: 0,
-            child: _miniLote(
-              emoji: '🎸',
-              titulo: 'Les Paul Studio',
-              valor: 'R\$ 9.800',
-              cor1: const Color(0xFF7C3AED),
-              cor2: const Color(0xFFA855F7),
-              rot: 0.04,
+          // Overlay duplo: cor + gradiente vertical pra texto sair bonito.
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: AppColors.ink.withValues(alpha: 0.58),
             ),
           ),
-          Positioned(
-            left: 250,
-            top: 50,
-            child: _miniLote(
-              emoji: '🏕️',
-              titulo: 'Camping de praia',
-              valor: 'R\$ 2.250',
-              cor1: const Color(0xFF059669),
-              cor2: const Color(0xFF10B981),
-              rot: 0.10,
-            ),
-          ),
-          Positioned(
-            right: -8,
-            top: 100,
-            child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: AppColors.ink,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: AppShadows.lift,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    '= 1 lote',
-                    style: AppTheme.mono(13,
-                            color: Colors.white,
-                            weight: FontWeight.w800)
-                        .copyWith(letterSpacing: -0.4),
-                  ),
-                  const SizedBox(width: 8),
-                  CathiraGlyph(
-                    size: 16,
-                    gradient: const LinearGradient(
-                      colors: [AppColors.primary, AppColors.accent],
-                    ),
-                  ),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  AppColors.ink.withValues(alpha: 0.20),
+                  AppColors.ink.withValues(alpha: 0.55),
+                  AppColors.ink.withValues(alpha: 0.92),
                 ],
-              ),
-            ),
-          ),
-          // Carimbo serigrafia no canto.
-          Positioned(
-            right: -28,
-            bottom: -10,
-            child: Opacity(
-              opacity: 0.18,
-              child: Transform.rotate(
-                angle: -0.12,
-                child: const CathiraStamp(size: 140),
+                stops: const [0.0, 0.55, 1.0],
               ),
             ),
           ),
@@ -402,73 +233,210 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Widget _miniLote({
-    required String emoji,
-    required String titulo,
-    required String valor,
-    required Color cor1,
-    required Color cor2,
-    required double rot,
-  }) {
-    return Transform.rotate(
-      angle: rot,
-      child: Container(
-        width: 160,
-        height: 200,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [cor1, cor2],
+  Widget _topBar({required bool light}) {
+    final c = light ? Colors.white : AppColors.ink;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
+        children: [
+          CathiraGlyph(size: 26, color: c),
+          const SizedBox(width: 8),
+          Text(
+            'cathira',
+            style: AppTheme.display(20, color: c, letter: 0.4),
           ),
-          boxShadow: AppShadows.lift,
-        ),
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(emoji, style: const TextStyle(fontSize: 36)),
-            const Spacer(),
-            Text(
-              titulo,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+            decoration: BoxDecoration(
+              color: light
+                  ? Colors.white.withValues(alpha: 0.16)
+                  : AppColors.ink.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(100),
+              border: Border.all(
+                  color: c.withValues(alpha: 0.25), width: 1),
+            ),
+            child: Text(
+              'BETA',
+              style: TextStyle(
+                color: c.withValues(alpha: 0.85),
+                fontSize: 9,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.5,
               ),
             ),
-            const SizedBox(height: 2),
-            Text(
-              valor,
-              style: AppTheme.mono(12,
-                  color: Colors.white.withValues(alpha: 0.95)),
+          ),
+          const Spacer(),
+          Text(
+            'BR',
+            style: TextStyle(
+              color: c.withValues(alpha: 0.6),
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.2,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  // ─── Coluna direita: card com formulário de auth
-  Widget _ctaCard(BuildContext context) {
+  // ─── Nome CATHIRA gigantesco.
+  Widget _cathiraLogoBlock({required double scale}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Tagline pequena acima.
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.14),
+              borderRadius: BorderRadius.circular(100),
+              border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.22), width: 1),
+            ),
+            child: Text(
+              'MARKETPLACE DE PERMUTA',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 10 * scale.clamp(1, 1.2),
+                fontWeight: FontWeight.w800,
+                letterSpacing: 2.4,
+              ),
+            ),
+          ),
+          SizedBox(height: 14 * scale),
+          // Nome enorme com gradient overlay.
+          ShaderMask(
+            shaderCallback: (rect) => const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFFFFFFFF),
+                Color(0xFFFDE2C8),
+                Color(0xFFFB923C),
+              ],
+              stops: [0.0, 0.45, 1.0],
+            ).createShader(rect),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                'CATHIRA',
+                style: AppTheme.display(
+                  120 * scale,
+                  color: Colors.white,
+                  letter: 4 * scale,
+                  height: 0.85,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 6 * scale),
+          // Manchete curta.
+          Text(
+            'não é troca — é cálculo.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.92),
+              fontSize: 16 * scale.clamp(1, 1.15),
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.4,
+            ),
+          ),
+          SizedBox(height: 8 * scale),
+          ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 380 * scale.clamp(1, 1.1)),
+            child: Text(
+              'Carro + bike + console viram um lote só. A torna sai calculada na hora.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.7),
+                fontSize: 13 * scale.clamp(1, 1.08),
+                height: 1.5,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _socialProof() {
     return Container(
-      padding: const EdgeInsets.all(28),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+      ),
+      child: Row(
+        children: [
+          _proofStat('7', 'setores'),
+          _proofDivider(),
+          _proofStat('R\$ 11M+', 'em catálogo'),
+          _proofDivider(),
+          _proofStat('70+', 'permutadores'),
+        ],
+      ),
+    );
+  }
+
+  Widget _proofStat(String value, String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(value,
+              style: AppTheme.display(24, color: Colors.white, letter: 0.3)),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.7),
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.2,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _proofDivider() => Container(
+        width: 1,
+        height: 36,
+        margin: const EdgeInsets.symmetric(horizontal: 18),
+        color: Colors.white.withValues(alpha: 0.22),
+      );
+
+  // ─── Card de auth.
+  Widget _ctaCard() {
+    final apiUrl = ref.watch(effectiveApiBaseUrlProvider);
+
+    return Container(
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: AppColors.ink.withValues(alpha: 0.06)),
-        boxShadow: AppShadows.soft,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.35),
+            blurRadius: 50,
+            offset: const Offset(0, 24),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            _waitingOtp ? 'confirme o código' : 'entrar',
-            style: AppTheme.display(26, weight: FontWeight.w700, letter: -0.8),
+            _waitingOtp ? 'CONFIRMA O CÓDIGO' : 'ENTRAR',
+            style: AppTheme.display(26, letter: 1.0),
           ),
           const SizedBox(height: 4),
           Text(
@@ -477,7 +445,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 : 'Telefone, Google ou modo dev.',
             style: const TextStyle(color: AppColors.muted, fontSize: 13),
           ),
-          const SizedBox(height: 22),
+          const SizedBox(height: 18),
           if (!_waitingOtp) ...[
             TextField(
               controller: _phoneCtrl,
@@ -513,89 +481,34 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: const Text('Trocar telefone'),
             ),
           ],
-          const SizedBox(height: 18),
+          const SizedBox(height: 14),
           Row(
             children: [
               Expanded(
                   child: Divider(color: AppColors.ink.withValues(alpha: 0.08))),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Text(
-                  'ou',
-                  style: AppTheme.mono(11,
-                      color: AppColors.muted, weight: FontWeight.w700),
-                ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Text('ou',
+                    style: TextStyle(
+                      color: AppColors.muted,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.5,
+                    )),
               ),
               Expanded(
                   child: Divider(color: AppColors.ink.withValues(alpha: 0.08))),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
           OutlinedButton.icon(
             onPressed: _loading ? null : _google,
             icon: const Icon(Icons.g_mobiledata_rounded, size: 26),
             label: const Text('Continuar com Google'),
           ),
           if (Env.devMode) ...[
-            const SizedBox(height: 18),
-            Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceAlt,
-                borderRadius: BorderRadius.circular(14),
-                border:
-                    Border.all(color: AppColors.ink.withValues(alpha: 0.06)),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: AppColors.ink,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(Icons.bolt_rounded,
-                        color: AppColors.accent, size: 14),
-                  ),
-                  const SizedBox(width: 10),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Acesso dev',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w800, fontSize: 12.5)),
-                        Text(
-                          'Token fake sem SMS/Google.',
-                          style: TextStyle(
-                              color: AppColors.muted,
-                              fontSize: 10.5,
-                              height: 1.2),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  TextButton(
-                    onPressed: _loading ? null : _devLogin,
-                    style: TextButton.styleFrom(
-                      backgroundColor: AppColors.ink,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
-                      minimumSize: const Size(0, 0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: const Text('Entrar',
-                        style: TextStyle(
-                            fontSize: 12, fontWeight: FontWeight.w800)),
-                  ),
-                ],
-              ),
-            ),
+            const SizedBox(height: 16),
+            _devBlock(apiUrl),
           ],
           if (_err != null) ...[
             const SizedBox(height: 14),
@@ -606,6 +519,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Icon(Icons.error_outline,
                       color: Colors.red, size: 18),
@@ -613,129 +527,192 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   Expanded(
                     child: Text(_err!,
                         style: const TextStyle(
-                            color: Colors.red, fontSize: 13)),
+                            color: Colors.red, fontSize: 12.5, height: 1.4)),
                   ),
                 ],
               ),
             ),
           ],
-          const SizedBox(height: 16),
-          Text(
-            'Ao entrar você concorda com nossos termos. A torna é referência — ajuste no chat.',
-            style: TextStyle(
-              color: AppColors.muted.withValues(alpha: 0.8),
-              fontSize: 11,
-              height: 1.4,
+        ],
+      ),
+    );
+  }
+
+  Widget _devBlock(String apiUrl) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceAlt,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.ink.withValues(alpha: 0.06)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 12, 8, 8),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: AppColors.ink,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.bolt_rounded,
+                      color: AppColors.accent, size: 14),
+                ),
+                const SizedBox(width: 10),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Acesso dev',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w800, fontSize: 12.5)),
+                      Text(
+                        'Token fake. Use no iPhone com IP da máquina.',
+                        style: TextStyle(
+                            color: AppColors.muted,
+                            fontSize: 10.5,
+                            height: 1.2),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                TextButton(
+                  onPressed: _loading ? null : _devLogin,
+                  style: TextButton.styleFrom(
+                    backgroundColor: AppColors.ink,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 8),
+                    minimumSize: const Size(0, 0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const Text('Entrar',
+                      style: TextStyle(
+                          fontSize: 12, fontWeight: FontWeight.w800)),
+                ),
+              ],
             ),
+          ),
+          Container(
+              height: 1, color: AppColors.ink.withValues(alpha: 0.05)),
+          // URL atual + edição
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
+            child: _editApiUrl
+                ? _apiUrlEditor(apiUrl)
+                : _apiUrlReadonly(apiUrl),
           ),
         ],
       ),
     );
   }
-}
 
-class _ProofStat extends StatelessWidget {
-  const _ProofStat({required this.value, required this.label});
-  final String value;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _apiUrlReadonly(String apiUrl) {
+    return Row(
       children: [
-        Text(value, style: AppTheme.display(22, weight: FontWeight.w700)),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: AppTheme.mono(10, color: AppColors.muted)
-              .copyWith(fontWeight: FontWeight.w800, letterSpacing: 1.2),
+        const Icon(Icons.lan_rounded, size: 14, color: AppColors.muted),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            apiUrl,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 11,
+              color: AppColors.ink,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'monospace',
+            ),
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            _apiUrlCtrl.text = apiUrl;
+            setState(() => _editApiUrl = true);
+          },
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+            minimumSize: const Size(0, 0),
+            foregroundColor: AppColors.primary,
+          ),
+          child: const Text('mudar',
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800)),
         ),
       ],
     );
   }
-}
 
-class _ProofDivider extends StatelessWidget {
-  const _ProofDivider();
-  @override
-  Widget build(BuildContext context) => Container(
-        width: 1,
-        height: 32,
-        margin: const EdgeInsets.symmetric(horizontal: 24),
-        color: AppColors.ink.withValues(alpha: 0.12),
-      );
-}
-
-class _PulsingDot extends StatefulWidget {
-  const _PulsingDot({required this.color});
-  final Color color;
-  @override
-  State<_PulsingDot> createState() => _PulsingDotState();
-}
-
-class _PulsingDotState extends State<_PulsingDot>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _ctrl;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1400),
-    )..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _ctrl,
-      builder: (_, __) {
-        return Stack(
-          alignment: Alignment.center,
+  Widget _apiUrlEditor(String apiUrl) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'URL da API (do iPhone, use o IP da máquina dev na LAN):',
+          style: TextStyle(
+            color: AppColors.muted,
+            fontSize: 10.5,
+            height: 1.3,
+          ),
+        ),
+        const SizedBox(height: 6),
+        TextField(
+          controller: _apiUrlCtrl,
+          autocorrect: false,
+          enableSuggestions: false,
+          keyboardType: TextInputType.url,
+          style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
+          decoration: const InputDecoration(
+            hintText: 'http://192.168.1.10:8080',
+            contentPadding:
+                EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
           children: [
-            Container(
-              width: 14,
-              height: 14,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: widget.color.withValues(alpha: 0.25 * (1 - _ctrl.value)),
+            TextButton(
+              onPressed: () async {
+                await ref.read(apiUrlOverrideProvider.notifier).set(null);
+                if (mounted) setState(() => _editApiUrl = false);
+              },
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                minimumSize: const Size(0, 0),
+                foregroundColor: AppColors.muted,
               ),
+              child: const Text('voltar ao default',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
             ),
-            Container(
-              width: 7,
-              height: 7,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: widget.color,
+            const Spacer(),
+            FilledButton(
+              onPressed: () async {
+                await ref
+                    .read(apiUrlOverrideProvider.notifier)
+                    .set(_apiUrlCtrl.text);
+                if (mounted) setState(() => _editApiUrl = false);
+              },
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.ink,
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 14, vertical: 8),
+                minimumSize: const Size(0, 0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
+              child: const Text('salvar',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
             ),
           ],
-        );
-      },
+        ),
+      ],
     );
   }
-}
-
-class _DotGridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = AppColors.ink.withValues(alpha: 0.18);
-    const step = 14.0;
-    for (double x = 0; x < size.width; x += step) {
-      for (double y = 0; y < size.height; y += step) {
-        canvas.drawCircle(Offset(x, y), 1.2, paint);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

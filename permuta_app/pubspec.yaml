@@ -35,6 +35,9 @@ dependencies:
   # Tipografia
   google_fonts: ^6.2.1
 
+  # Persistência leve (URL dev customizada, etc.)
+  shared_preferences: ^2.3.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

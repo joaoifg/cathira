@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../env/env.dart';
+import '../env/api_url_override.dart';
 import '../supabase/supabase_providers.dart';
 import '../../features/auth/dev_auth.dart';
 
@@ -11,10 +11,11 @@ import '../../features/auth/dev_auth.dart';
 ///   - senão, manda o JWT do Supabase Auth (faz refresh se estiver perto de expirar)
 final apiClientProvider = Provider<Dio>((ref) {
   final supabase = ref.watch(supabaseClientProvider);
+  final baseUrl = ref.watch(effectiveApiBaseUrlProvider);
 
   final dio = Dio(
     BaseOptions(
-      baseUrl: Env.apiBaseUrl,
+      baseUrl: baseUrl,
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 15),
       contentType: 'application/json',

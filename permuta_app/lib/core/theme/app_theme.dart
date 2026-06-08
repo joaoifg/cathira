@@ -180,20 +180,20 @@ class AppTheme {
   }
 
   static TextTheme _textTheme(TextTheme base) {
-    // Display: Unbounded (condensada, poster, identidade brasileira moderna).
+    // Display: Bebas Neue (condensada poster, alta legibilidade em tamanho gigante).
     // Body / labels: Plus Jakarta Sans (humana, legível).
-    // Mono labels: JetBrains Mono (tabular figures, vibe técnica).
+    // Mono labels: JetBrains Mono (tabular figures).
     return GoogleFonts.plusJakartaSansTextTheme(base).copyWith(
-      displayLarge: GoogleFonts.unbounded(
-          fontSize: 46, fontWeight: FontWeight.w700, color: AppColors.ink, letterSpacing: -2.4, height: 0.95),
-      displayMedium: GoogleFonts.unbounded(
-          fontSize: 38, fontWeight: FontWeight.w700, color: AppColors.ink, letterSpacing: -2.0, height: 0.96),
-      displaySmall: GoogleFonts.unbounded(
-          fontSize: 30, fontWeight: FontWeight.w700, color: AppColors.ink, letterSpacing: -1.4, height: 1.0),
-      headlineMedium: GoogleFonts.unbounded(
-          fontSize: 24, fontWeight: FontWeight.w700, color: AppColors.ink, letterSpacing: -1.0),
-      titleLarge: GoogleFonts.unbounded(
-          fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.ink, letterSpacing: -0.6),
+      displayLarge: GoogleFonts.bebasNeue(
+          fontSize: 56, color: AppColors.ink, letterSpacing: 0.5, height: 0.92),
+      displayMedium: GoogleFonts.bebasNeue(
+          fontSize: 46, color: AppColors.ink, letterSpacing: 0.4, height: 0.94),
+      displaySmall: GoogleFonts.bebasNeue(
+          fontSize: 36, color: AppColors.ink, letterSpacing: 0.3, height: 0.96),
+      headlineMedium: GoogleFonts.bebasNeue(
+          fontSize: 28, color: AppColors.ink, letterSpacing: 0.3),
+      titleLarge: GoogleFonts.bebasNeue(
+          fontSize: 22, color: AppColors.ink, letterSpacing: 0.4),
       titleMedium: GoogleFonts.plusJakartaSans(
           fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.ink),
       bodyLarge: GoogleFonts.plusJakartaSans(
@@ -211,15 +211,15 @@ class AppTheme {
     );
   }
 
-  /// Helper pra usar Unbounded inline (display).
-  /// Unbounded já é bem condensada — letterSpacing default mais agressivo.
-  static TextStyle display(double size, {Color? color, FontWeight? weight, double? letter}) {
-    return GoogleFonts.unbounded(
+  /// Helper pra usar Bebas Neue inline (display).
+  /// O parâmetro [weight] é aceito mas ignorado — Bebas Neue só tem 400.
+  static TextStyle display(double size,
+      {Color? color, double? letter, double? height, FontWeight? weight}) {
+    return GoogleFonts.bebasNeue(
       fontSize: size,
-      fontWeight: weight ?? FontWeight.w700,
       color: color ?? AppColors.ink,
-      letterSpacing: letter ?? -(size * 0.05),
-      height: 0.96,
+      letterSpacing: letter ?? (size * 0.012),
+      height: height ?? 0.92,
     );
   }
 

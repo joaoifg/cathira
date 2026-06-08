@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/env/env.dart';
+import '../../core/env/api_url_override.dart';
 import '../../core/supabase/supabase_providers.dart';
 
 class DevSession {
@@ -27,7 +27,8 @@ class DevAuthController {
   final Ref ref;
 
   Future<void> login({String nome = 'Dev User', String? email}) async {
-    final dio = Dio(BaseOptions(baseUrl: Env.apiBaseUrl));
+    final baseUrl = ref.read(effectiveApiBaseUrlProvider);
+    final dio = Dio(BaseOptions(baseUrl: baseUrl));
     final r = await dio.post('/dev/login', data: {
       'nome': nome,
       if (email != null) 'email': email,
