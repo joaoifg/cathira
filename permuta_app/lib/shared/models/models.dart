@@ -47,6 +47,7 @@ class Lote {
     this.numItens = 0,
     this.capa,
     this.fotos = const [],
+    this.emDestaque = false,
   });
 
   final String id;
@@ -57,13 +58,14 @@ class Lote {
   final double? faixaAlvoMax;
   final String? cidade;
   final String status;
-  final String? donoId; // pra abrir o perfil público do dono no tap
+  final String? donoId;
   final String? donoNome;
   final String? donoCidade;
   final double donoReputacao;
   final int numItens;
   final String? capa;
   final List<String> fotos;
+  final bool emDestaque;
 
   factory Lote.fromJson(Map<String, dynamic> j) => Lote(
         id: j['id'] as String,
@@ -83,6 +85,7 @@ class Lote {
         fotos: ((j['fotos'] as List?) ?? const [])
             .map((e) => e.toString())
             .toList(),
+        emDestaque: j['em_destaque'] as bool? ?? false,
       );
 }
 

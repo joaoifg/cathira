@@ -523,6 +523,35 @@ class _LoteCard extends ConsumerWidget {
               ],
             ),
             const Spacer(),
+            if (lote.emDestaque)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [AppColors.accent, AppColors.primary],
+                    ),
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.local_fire_department_rounded,
+                          color: Colors.white, size: 13),
+                      const SizedBox(width: 4),
+                      Text(
+                        'DESTAQUE',
+                        style: AppTheme.mono(10, color: Colors.white)
+                            .copyWith(
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 1.4),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             Text(
               lote.titulo,
               style: const TextStyle(

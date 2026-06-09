@@ -102,6 +102,10 @@ func New(ctx context.Context, cfg config.Config) (*App, error) {
 		perfilH := handler.NewPerfilHandler(pool)
 		api.GET("/perfis/:id", perfilH.Get)
 
+		destH := handler.NewDestaqueHandler(pool)
+		api.POST("/itens/:id/destacar", destH.DestacarItem)
+		api.POST("/lotes/:id/destacar", destH.DestacarLote)
+
 		if cfg.DevMode {
 			seedH := handler.NewSeedHandler(pool, cfg)
 			api.POST("/dev/seed", seedH.Run)

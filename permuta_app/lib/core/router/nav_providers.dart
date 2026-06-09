@@ -9,11 +9,11 @@ final currentTabProvider = StateProvider<int>((_) => 0);
 final setorInicialProvider = StateProvider<String?>((_) => null);
 
 /// Índices fixos das abas — fonte única de verdade.
+/// Lotes + Itens viraram uma aba só: "Acervo".
 class AppTab {
   static const home = 0;
   static const descobrir = 1;
-  static const lotes = 2;
-  static const itens = 3;
-  static const negocios = 4;
-  static const perfil = 5;
+  static const acervo = 2;
+  static const negocios = 3;
+  static const perfil = 4;
 }

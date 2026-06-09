@@ -54,8 +54,9 @@ type FeedItem struct {
 	DonoCidade    *string  `json:"dono_cidade,omitempty"`
 	DonoReputacao float64  `json:"dono_reputacao"`
 	NumItens      int      `json:"num_itens"`
-	Capa          *string  `json:"capa,omitempty"`  // 1ª foto do lote, pra capa do card
-	Fotos         []string `json:"fotos,omitempty"` // até 6 fotos do lote pra galeria
+	Capa          *string  `json:"capa,omitempty"`
+	Fotos         []string `json:"fotos,omitempty"`
+	EmDestaque    bool     `json:"em_destaque"`
 }
 
 func (r *LoteRepo) Feed(ctx context.Context, donoID uuid.UUID, q domain.FeedQuery) ([]FeedItem, error) {
@@ -74,7 +75,8 @@ func (r *LoteRepo) Feed(ctx context.Context, donoID uuid.UUID, q domain.FeedQuer
 		              where i.lote_id = l.id and coalesce(array_length(i.fotos,1),0) > 0
 		              limit 6
 		           ) f
-		       ) as fotos
+		       ) as fotos,
+		       (l.destaque_ate is not null and l.destaque_ate > now()) as em_destaque
 		  from lotes l
 		  join profiles p on p.id = l.dono_id
 		 where l.status = 'aberto'
@@ -84,7 +86,8 @@ func (r *LoteRepo) Feed(ctx context.Context, donoID uuid.UUID, q domain.FeedQuer
 		   and ($4 = 0  or l.valor_total <= $4)
 		   and ($5 = '' or coalesce(p.cidade,'') ilike '%' || $5 || '%')
 		   and l.id not in (select to_lote from swipes where from_id = $1)
-		 order by l.criado_em desc
+		 order by (l.destaque_ate is not null and l.destaque_ate > now()) desc,
+		          l.criado_em desc
 		 limit $6
 	`, donoID, q.Setor, q.FaixaMin, q.FaixaMax, q.Cidade, q.Limit)
 	if err != nil {
@@ -97,7 +100,7 @@ func (r *LoteRepo) Feed(ctx context.Context, donoID uuid.UUID, q domain.FeedQuer
 		var f FeedItem
 		if err := rows.Scan(&f.ID, &f.DonoID, &f.Titulo, &f.SetorPrincipal, &f.ValorTotal,
 			&f.FaixaAlvoMin, &f.FaixaAlvoMax, &f.AceitaTorna, &f.AceitaParcial, &f.Cidade, &f.Status, &f.CriadoEm,
-			&f.DonoNome, &f.DonoCidade, &f.DonoReputacao, &f.NumItens, &f.Fotos); err != nil {
+			&f.DonoNome, &f.DonoCidade, &f.DonoReputacao, &f.NumItens, &f.Fotos, &f.EmDestaque); err != nil {
 			return nil, err
 		}
 		if len(f.Fotos) > 0 {

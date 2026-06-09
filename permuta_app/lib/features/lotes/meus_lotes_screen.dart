@@ -8,38 +8,25 @@ import '../../shared/widgets/brl.dart';
 import 'novo_lote_screen.dart';
 import 'lote_detalhe_screen.dart';
 
-class MeusLotesScreen extends ConsumerWidget {
-  const MeusLotesScreen({super.key});
+/// Abre a tela de novo lote e invalida a lista no retorno. Reusado pela aba
+/// Acervo (que provê o FAB contextual).
+Future<void> abrirNovoLote(BuildContext context, WidgetRef ref) async {
+  final created = await Navigator.of(context).push<bool>(
+    MaterialPageRoute(builder: (_) => const NovoLoteScreen()),
+  );
+  if (created == true) ref.invalidate(meusLotesProvider);
+}
+
+/// Corpo da listagem de lotes, sem Scaffold — pra ser embutido na aba Acervo.
+class MeusLotesBody extends ConsumerWidget {
+  const MeusLotesBody({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final lotes = ref.watch(meusLotesProvider);
     final setores = ref.watch(setoresProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Meus lotes'),
-        actions: [
-          IconButton(
-            tooltip: 'Atualizar',
-            onPressed: () => ref.invalidate(meusLotesProvider),
-            icon: const Icon(Icons.refresh_rounded),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        onPressed: () async {
-          final created = await Navigator.of(context).push<bool>(
-            MaterialPageRoute(builder: (_) => const NovoLoteScreen()),
-          );
-          if (created == true) ref.invalidate(meusLotesProvider);
-        },
-        icon: const Icon(Icons.add_rounded),
-        label: const Text('Novo lote'),
-      ),
-      body: lotes.when(
+    return lotes.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Erro: $e')),
         data: (data) {
@@ -64,7 +51,6 @@ class MeusLotesScreen extends ConsumerWidget {
             ),
           );
         },
-      ),
     );
   }
 
