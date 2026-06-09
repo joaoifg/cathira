@@ -17,9 +17,11 @@ primary_region = "gru"   # São Paulo
 [http_service]
   internal_port = 8080
   force_https = true
+  # Mantém 1 máquina sempre rodando pra evitar cold start de ~3s.
+  # Com 2 máquinas no app, uma fica viva e a outra pode parar.
   auto_stop_machines = "stop"
   auto_start_machines = true
-  min_machines_running = 0
+  min_machines_running = 1
 
   [[http_service.checks]]
     interval = "15s"
