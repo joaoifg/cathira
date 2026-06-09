@@ -1,3 +1,5 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -245,37 +247,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             'cathira',
             style: AppTheme.display(20, color: c, letter: 0.4),
           ),
-          const SizedBox(width: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-            decoration: BoxDecoration(
-              color: light
-                  ? Colors.white.withValues(alpha: 0.16)
-                  : AppColors.ink.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(100),
-              border: Border.all(
-                  color: c.withValues(alpha: 0.25), width: 1),
-            ),
-            child: Text(
-              'BETA',
-              style: TextStyle(
-                color: c.withValues(alpha: 0.85),
-                fontSize: 9,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 1.5,
-              ),
-            ),
-          ),
           const Spacer(),
-          Text(
-            'BR',
-            style: TextStyle(
-              color: c.withValues(alpha: 0.6),
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.2,
-            ),
-          ),
         ],
       ),
     );
@@ -288,27 +260,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Tagline pequena acima.
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.14),
-              borderRadius: BorderRadius.circular(100),
-              border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.22), width: 1),
-            ),
-            child: Text(
-              'MARKETPLACE DE PERMUTA',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 10 * scale.clamp(1, 1.2),
-                fontWeight: FontWeight.w800,
-                letterSpacing: 2.4,
-              ),
-            ),
-          ),
-          SizedBox(height: 14 * scale),
-          // Nome enorme com gradient overlay.
+          // Nome enorme com gradient overlay. Único protagonista da tela.
           ShaderMask(
             shaderCallback: (rect) => const LinearGradient(
               begin: Alignment.topLeft,
@@ -325,7 +277,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: Text(
                 'CATHIRA',
                 style: AppTheme.display(
-                  120 * scale,
+                  140 * scale,
                   color: Colors.white,
                   letter: 4 * scale,
                   height: 0.85,
@@ -333,32 +285,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
             ),
           ),
-          SizedBox(height: 6 * scale),
-          // Manchete curta.
-          Text(
-            'não é troca — é cálculo.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.92),
-              fontSize: 16 * scale.clamp(1, 1.15),
-              fontWeight: FontWeight.w700,
-              letterSpacing: -0.4,
-            ),
-          ),
-          SizedBox(height: 8 * scale),
-          ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 380 * scale.clamp(1, 1.1)),
-            child: Text(
-              'Carro + bike + console viram um lote só. A torna sai calculada na hora.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.7),
-                fontSize: 13 * scale.clamp(1, 1.08),
-                height: 1.5,
-              ),
-            ),
-          ),
-          SizedBox(height: 22 * scale.clamp(1, 1.2)),
+          SizedBox(height: 32 * scale.clamp(1, 1.2)),
           _miniLotesFan(scale: scale),
         ],
       ),
@@ -388,6 +315,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               cor1: const Color(0xFFDC2626),
               cor2: const Color(0xFFEF4444),
               rot: -0.12,
+              fotoSeed: 'civic-vermelho',
             ),
           ),
           _miniLote(
@@ -399,6 +327,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             cor1: const Color(0xFF7C3AED),
             cor2: const Color(0xFFA855F7),
             rot: 0.0,
+            fotoSeed: 'guitarra-estudio',
           ),
           Positioned(
             right: -(w * 0.55),
@@ -412,6 +341,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               cor1: const Color(0xFF059669),
               cor2: const Color(0xFF10B981),
               rot: 0.14,
+              fotoSeed: 'camping-barraca',
             ),
           ),
           // Badge "= 1 lote" pendurado embaixo.
@@ -459,6 +389,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     required Color cor1,
     required Color cor2,
     required double rot,
+    required String fotoSeed,
   }) {
     return Transform.rotate(
       angle: rot,
@@ -466,39 +397,129 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         width: w,
         height: h,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [cor1, cor2],
-          ),
-          boxShadow: AppShadows.lift,
-          border: Border.all(
-              color: Colors.white.withValues(alpha: 0.25), width: 1),
-        ),
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(emoji, style: TextStyle(fontSize: w * 0.24)),
-            const Spacer(),
-            Text(
-              titulo,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: w * 0.085,
-                fontWeight: FontWeight.w800,
-              ),
+          borderRadius: BorderRadius.circular(22),
+          boxShadow: [
+            BoxShadow(
+              color: cor1.withValues(alpha: 0.45),
+              blurRadius: 28,
+              offset: const Offset(0, 14),
             ),
-            const SizedBox(height: 2),
-            Text(
-              valor,
-              style: AppTheme.mono(w * 0.08,
-                  color: Colors.white.withValues(alpha: 0.95)),
+            const BoxShadow(
+              color: Color(0x33000000),
+              blurRadius: 16,
+              offset: Offset(0, 10),
             ),
           ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(22),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // Foto picsum como background.
+              Image.network(
+                'https://picsum.photos/seed/$fotoSeed/480/600',
+                fit: BoxFit.cover,
+                gaplessPlayback: true,
+                errorBuilder: (_, __, ___) => Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [cor1, cor2],
+                    ),
+                  ),
+                ),
+              ),
+              // Efeito glass: blur a foto + cor do setor sutil por cima.
+              BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        cor1.withValues(alpha: 0.32),
+                        cor2.withValues(alpha: 0.18),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              // Vinheta escura embaixo pra texto sair legível.
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withValues(alpha: 0.55),
+                    ],
+                    stops: const [0.4, 1.0],
+                  ),
+                ),
+              ),
+              // Borda branca translúcida.
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.35),
+                    width: 1,
+                  ),
+                ),
+              ),
+              // Conteúdo.
+              Padding(
+                padding: const EdgeInsets.all(14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Chip do setor com emoji + cor.
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.92),
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child: Text(
+                        emoji,
+                        style: TextStyle(fontSize: w * 0.12),
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      titulo,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: w * 0.095,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.3,
+                        shadows: const [
+                          Shadow(
+                            color: Color(0x80000000),
+                            blurRadius: 6,
+                            offset: Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      valor,
+                      style: AppTheme.mono(w * 0.085,
+                          color: Colors.white, weight: FontWeight.w800),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -554,24 +575,37 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         color: Colors.white.withValues(alpha: 0.22),
       );
 
-  // ─── Card de auth.
+  // ─── Card de auth com efeito glass (frosted).
   Widget _ctaCard() {
     final apiUrl = ref.watch(effectiveApiBaseUrlProvider);
 
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.35),
-            blurRadius: 50,
-            offset: const Offset(0, 24),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(28),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.78),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.55),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.42),
+                blurRadius: 60,
+                offset: const Offset(0, 28),
+              ),
+              BoxShadow(
+                color: Colors.white.withValues(alpha: 0.05),
+                blurRadius: 1,
+                offset: const Offset(0, -1),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
+          child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -675,6 +709,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
           ],
         ],
+      ),
+        ),
       ),
     );
   }
