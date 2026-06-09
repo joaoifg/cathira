@@ -244,120 +244,233 @@ class HomeScreen extends ConsumerWidget {
   }
 
   Widget _comoFunciona(BuildContext ctx) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: AppColors.gradInk,
-          borderRadius: BorderRadius.circular(24),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: Stack(
+    final passos = [
+      (
+        '📦',
+        'monta um lote',
+        'Junta 1, 2 ou 10 itens — você decide o que entra.',
+        const [Color(0xFFF43F5E), Color(0xFFFB7185)],
+      ),
+      (
+        '🔥',
+        'descobre',
+        'Lotes na sua faixa de valor aparecem no feed.',
+        const [Color(0xFFFB923C), Color(0xFFFBBF24)],
+      ),
+      (
+        '⚖️',
+        'mesa ao vivo',
+        'Adiciona ou tira item, torna recalcula sozinha.',
+        const [Color(0xFF7C3AED), Color(0xFFA855F7)],
+      ),
+      (
+        '🤝',
+        'aceita e fecha',
+        'Os dois confirmam — virou compromisso.',
+        const [Color(0xFF059669), Color(0xFF10B981)],
+      ),
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 4),
+          child: Row(
             children: [
-              // Stamp decorativo no canto (vibe serigrafia).
-              Positioned(
-                right: -20,
-                top: -20,
-                child: Opacity(
-                  opacity: 0.10,
-                  child: CathiraStamp(size: 180, color: Colors.white),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.ink,
+                  borderRadius: BorderRadius.circular(100),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 5,
+                      height: 5,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.accent,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'COMO FUNCIONA',
+                      style: AppTheme.mono(9, color: Colors.white)
+                          .copyWith(
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.6),
+                    ),
+                  ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 22, 24, 22),
-                child: _comoFuncionaInner(),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Container(
+                  height: 1,
+                  color: AppColors.ink.withValues(alpha: 0.1),
+                ),
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _comoFuncionaInner() {
-    final passos = [
-      ('📦', 'monta um lote',
-          'Junta 1, 2 ou 10 itens — você decide o que entra.'),
-      ('🔥', 'descobre',
-          'Lotes na sua faixa de valor aparecem no feed.'),
-      ('⚖️', 'mesa ao vivo',
-          'Adiciona ou tira item, torna recalcula sozinha.'),
-      ('🤝', 'aceita e fecha', 'Os dois confirmam — virou compromisso.'),
-    ];
-    return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
+          child: RichText(
+            text: TextSpan(
+              style: AppTheme.display(28,
+                  color: AppColors.ink,
+                  weight: FontWeight.w700,
+                  letter: -1.4),
               children: [
-                Container(
-                  width: 6,
-                  height: 6,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.accent,
+                const TextSpan(text: 'quatro passos.\n'),
+                TextSpan(
+                  text: 'sem mistério.',
+                  style: TextStyle(
+                    foreground: Paint()
+                      ..shader = const LinearGradient(
+                        colors: [Color(0xFFF43F5E), Color(0xFFFB923C)],
+                      ).createShader(const Rect.fromLTWH(0, 0, 280, 50)),
                   ),
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  'COMO FUNCIONA',
-                  style: AppTheme.mono(10,
-                          color: AppColors.accent, weight: FontWeight.w800)
-                      .copyWith(letterSpacing: 1.6),
                 ),
               ],
             ),
-            const SizedBox(height: 10),
-            Text(
-              'mecânica\nda cathira.',
-              style: AppTheme.display(28,
-                  color: Colors.white, weight: FontWeight.w700, letter: -1.4),
-            ),
-            const SizedBox(height: 18),
-            ...passos.asMap().entries.map((e) {
-              final p = e.value;
-              final n = e.key + 1;
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: 28,
-                      child: Text(
-                        '0$n',
-                        style: AppTheme.mono(14,
-                            color: AppColors.accent, weight: FontWeight.w800),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(p.$1, style: const TextStyle(fontSize: 18)),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(p.$2,
-                              style: AppTheme.display(15,
-                                  color: Colors.white,
-                                  weight: FontWeight.w700,
-                                  letter: -0.4)),
-                          const SizedBox(height: 1),
-                          Text(p.$3,
-                              style: TextStyle(
-                                  color:
-                                      Colors.white.withValues(alpha: 0.72),
-                                  fontSize: 12.5,
-                                  height: 1.3)),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+          ),
+        ),
+        SizedBox(
+          height: 200,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.fromLTRB(20, 4, 20, 4),
+            itemCount: passos.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            itemBuilder: (_, i) {
+              final p = passos[i];
+              return _ComoFuncionaCard(
+                numero: '0${i + 1}',
+                emoji: p.$1,
+                titulo: p.$2,
+                descricao: p.$3,
+                cor1: p.$4[0],
+                cor2: p.$4[1],
               );
-            }),
+            },
+          ),
+        ),
+        const SizedBox(height: 8),
+      ],
+    );
+  }
+}
+
+class _ComoFuncionaCard extends StatelessWidget {
+  const _ComoFuncionaCard({
+    required this.numero,
+    required this.emoji,
+    required this.titulo,
+    required this.descricao,
+    required this.cor1,
+    required this.cor2,
+  });
+
+  final String numero;
+  final String emoji;
+  final String titulo;
+  final String descricao;
+  final Color cor1;
+  final Color cor2;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 200,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(22),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [cor1, cor2],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: cor1.withValues(alpha: 0.35),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(22),
+        child: Stack(
+          children: [
+            // Halo decorativo no canto.
+            Positioned(
+              top: -28,
+              right: -28,
+              child: Container(
+                width: 110,
+                height: 110,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.18),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.25),
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: Text(
+                          numero,
+                          style: AppTheme.mono(10, color: Colors.white)
+                              .copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 1.4),
+                        ),
+                      ),
+                      const Spacer(),
+                      Text(emoji, style: const TextStyle(fontSize: 28)),
+                    ],
+                  ),
+                  const Spacer(),
+                  Text(
+                    titulo,
+                    style: AppTheme.display(20,
+                        color: Colors.white,
+                        weight: FontWeight.w700,
+                        letter: -0.6),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    descricao,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.92),
+                      fontSize: 12,
+                      height: 1.35,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
-        );
+        ),
+      ),
+    );
   }
 }
 
@@ -393,11 +506,11 @@ class _Saudacao extends ConsumerWidget {
                 : 'boa noite';
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Branding bar com pulsing dot
+          // Top bar: branding à esquerda, saudação à direita.
           Row(
             children: [
               const CathiraGlyph(size: 22, color: AppColors.ink),
@@ -420,37 +533,108 @@ class _Saudacao extends ConsumerWidget {
                 style: AppTheme.mono(9, color: AppColors.muted)
                     .copyWith(fontWeight: FontWeight.w800, letterSpacing: 1.2),
               ),
-            ],
-          ),
-          const SizedBox(height: 18),
-          Row(
-            children: [
-              Text(emoji, style: const TextStyle(fontSize: 18)),
-              const SizedBox(width: 6),
-              Text(
-                '$saudacao${nome.isNotEmpty ? ", $nome" : ""}',
-                style: AppTheme.mono(11, color: AppColors.muted)
-                    .copyWith(fontWeight: FontWeight.w800, letterSpacing: 1.4),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: AppColors.ink.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(100),
+                ),
+                child: Row(
+                  children: [
+                    Text(emoji, style: const TextStyle(fontSize: 13)),
+                    const SizedBox(width: 5),
+                    Text(
+                      '$saudacao${nome.isNotEmpty ? ", $nome" : ""}',
+                      style: const TextStyle(
+                        color: AppColors.ink,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 11,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          RichText(
-            text: TextSpan(
-              style: AppTheme.display(36,
-                  weight: FontWeight.w700, letter: -1.8),
+          const SizedBox(height: 28),
+          // Manchete centralizada com fundo geométrico.
+          Center(
+            child: Stack(
+              alignment: Alignment.center,
               children: [
-                const TextSpan(text: 'monta o lote.\n'),
-                TextSpan(
-                  text: 'a torna',
-                  style: TextStyle(
-                    foreground: Paint()
-                      ..shader = const LinearGradient(
-                        colors: [Color(0xFFF43F5E), Color(0xFFFB923C)],
-                      ).createShader(const Rect.fromLTWH(0, 0, 220, 50)),
+                // Anel decorativo atrás do texto.
+                Container(
+                  width: 220,
+                  height: 220,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        AppColors.primary.withValues(alpha: 0.12),
+                        AppColors.accent.withValues(alpha: 0.04),
+                        Colors.transparent,
+                      ],
+                      stops: const [0.0, 0.6, 1.0],
+                    ),
                   ),
                 ),
-                const TextSpan(text: '\nresolve sozinha.'),
+                Column(
+                  children: [
+                    // Eyebrow pequeno acima.
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.ink,
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.bolt_rounded,
+                              color: AppColors.accent, size: 12),
+                          const SizedBox(width: 4),
+                          Text(
+                            'TORNA AUTOMÁTICA',
+                            style: AppTheme.mono(9, color: Colors.white)
+                                .copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 1.6),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Manchete centralizada com gradient na 2ª linha.
+                    RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        style: AppTheme.display(44,
+                            weight: FontWeight.w700, letter: -2.0, height: 0.95),
+                        children: [
+                          const TextSpan(text: 'monta o lote.\n'),
+                          TextSpan(
+                            text: 'a torna',
+                            style: TextStyle(
+                              foreground: Paint()
+                                ..shader = const LinearGradient(
+                                  colors: [
+                                    Color(0xFFF43F5E),
+                                    Color(0xFFFB923C),
+                                  ],
+                                ).createShader(
+                                    const Rect.fromLTWH(0, 0, 240, 50)),
+                            ),
+                          ),
+                          const TextSpan(text: ' resolve\nsozinha.'),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
