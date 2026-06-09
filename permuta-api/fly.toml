@@ -9,7 +9,10 @@ primary_region = "gru"   # São Paulo
 [env]
   ENV = "production"
   PORT = "8080"
-  DEV_MODE = "false"
+  # DEV_MODE=true habilita POST /dev/login + /dev/seed + /dev/upload.
+  # Mantido true enquanto os logins SMS/Google não estão plugados.
+  # Quando ligar auth real, voltar pra "false" e fazer redeploy.
+  DEV_MODE = "true"
 
 [http_service]
   internal_port = 8080
