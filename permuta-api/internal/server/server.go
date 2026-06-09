@@ -99,6 +99,9 @@ func New(ctx context.Context, cfg config.Config) (*App, error) {
 		avH := handler.NewAvaliacaoHandler(pool)
 		api.POST("/avaliacoes", avH.Create)
 
+		perfilH := handler.NewPerfilHandler(pool)
+		api.GET("/perfis/:id", perfilH.Get)
+
 		if cfg.DevMode {
 			seedH := handler.NewSeedHandler(pool, cfg)
 			api.POST("/dev/seed", seedH.Run)

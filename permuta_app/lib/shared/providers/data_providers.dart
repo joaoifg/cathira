@@ -92,6 +92,13 @@ class NegociacaoDetalhe {
   final String meuLado; // 'a' ou 'b'
 }
 
+final perfilPublicoProvider =
+    FutureProvider.family<PerfilPublico, String>((ref, userId) async {
+  final dio = ref.watch(apiClientProvider);
+  final r = await dio.get('/perfis/$userId');
+  return PerfilPublico.fromJson(Map<String, dynamic>.from(r.data as Map));
+});
+
 final mensagensProvider =
     FutureProvider.family<List<Mensagem>, String>((ref, negId) async {
   final dio = ref.watch(apiClientProvider);

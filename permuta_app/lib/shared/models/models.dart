@@ -37,6 +37,7 @@ class Lote {
     required this.setorPrincipal,
     required this.valorTotal,
     required this.status,
+    this.donoId,
     this.faixaAlvoMin,
     this.faixaAlvoMax,
     this.cidade,
@@ -56,12 +57,13 @@ class Lote {
   final double? faixaAlvoMax;
   final String? cidade;
   final String status;
+  final String? donoId; // pra abrir o perfil público do dono no tap
   final String? donoNome;
   final String? donoCidade;
   final double donoReputacao;
   final int numItens;
-  final String? capa; // 1ª foto do lote, pra capa do card de descoberta
-  final List<String> fotos; // até 6 fotos do lote pra galeria
+  final String? capa;
+  final List<String> fotos;
 
   factory Lote.fromJson(Map<String, dynamic> j) => Lote(
         id: j['id'] as String,
@@ -72,6 +74,7 @@ class Lote {
         faixaAlvoMax: (j['faixa_alvo_max'] as num?)?.toDouble(),
         cidade: j['cidade'] as String?,
         status: j['status'] as String? ?? 'aberto',
+        donoId: j['dono_id'] as String?,
         donoNome: j['dono_nome'] as String?,
         donoCidade: j['dono_cidade'] as String?,
         donoReputacao: (j['dono_reputacao'] as num?)?.toDouble() ?? 0,
@@ -210,6 +213,144 @@ class LoteMini {
         donoId: j['dono_id'] as String,
         donoNome: j['dono_nome'] as String? ?? '—',
         setorPrincipal: j['setor_principal'] as String,
+      );
+}
+
+/// Perfil simplificado do dono (subset de profiles).
+class PerfilDono {
+  PerfilDono({
+    required this.id,
+    required this.nome,
+    required this.reputacao,
+    required this.numTrocas,
+    this.fotoUrl,
+    this.cidade,
+  });
+
+  final String id;
+  final String nome;
+  final String? fotoUrl;
+  final String? cidade;
+  final double reputacao;
+  final int numTrocas;
+
+  factory PerfilDono.fromJson(Map<String, dynamic> j) => PerfilDono(
+        id: j['id'] as String,
+        nome: j['nome'] as String? ?? '—',
+        fotoUrl: j['foto_url'] as String?,
+        cidade: j['cidade'] as String?,
+        reputacao: (j['reputacao'] as num?)?.toDouble() ?? 0,
+        numTrocas: (j['num_trocas'] as num?)?.toInt() ?? 0,
+      );
+}
+
+/// Lote resumido pra mostrar na página pública.
+class LoteMiniPub {
+  LoteMiniPub({
+    required this.id,
+    required this.titulo,
+    required this.setorPrincipal,
+    required this.valorTotal,
+    required this.numItens,
+    this.capa,
+  });
+
+  final String id;
+  final String titulo;
+  final String setorPrincipal;
+  final double valorTotal;
+  final int numItens;
+  final String? capa;
+
+  factory LoteMiniPub.fromJson(Map<String, dynamic> j) => LoteMiniPub(
+        id: j['id'] as String,
+        titulo: j['titulo'] as String,
+        setorPrincipal: j['setor_principal'] as String,
+        valorTotal: (j['valor_total'] as num?)?.toDouble() ?? 0,
+        numItens: (j['num_itens'] as num?)?.toInt() ?? 0,
+        capa: j['capa'] as String?,
+      );
+}
+
+/// Item público (com info do lote se pertencer a algum).
+class ItemPub {
+  ItemPub({
+    required this.id,
+    required this.titulo,
+    required this.setorSlug,
+    required this.categoria,
+    required this.valorReferencia,
+    required this.fotos,
+    this.descricao,
+    this.loteId,
+    this.loteTitulo,
+  });
+
+  final String id;
+  final String titulo;
+  final String? descricao;
+  final List<String> fotos;
+  final String setorSlug;
+  final String categoria;
+  final double valorReferencia;
+  final String? loteId;
+  final String? loteTitulo;
+
+  factory ItemPub.fromJson(Map<String, dynamic> j) => ItemPub(
+        id: j['id'] as String,
+        titulo: j['titulo'] as String,
+        descricao: j['descricao'] as String?,
+        fotos: ((j['fotos'] as List?) ?? const [])
+            .map((e) => e.toString())
+            .toList(),
+        setorSlug: j['setor_slug'] as String,
+        categoria: j['categoria'] as String,
+        valorReferencia: (j['valor_referencia'] as num?)?.toDouble() ?? 0,
+        loteId: j['lote_id'] as String?,
+        loteTitulo: j['lote_titulo'] as String?,
+      );
+}
+
+class AvaliacaoPub {
+  AvaliacaoPub({required this.nota, required this.deNome, this.comentario});
+  final int nota;
+  final String deNome;
+  final String? comentario;
+
+  factory AvaliacaoPub.fromJson(Map<String, dynamic> j) => AvaliacaoPub(
+        nota: (j['nota'] as num).toInt(),
+        deNome: j['de_nome'] as String? ?? '—',
+        comentario: j['comentario'] as String?,
+      );
+}
+
+class PerfilPublico {
+  PerfilPublico({
+    required this.perfil,
+    required this.itens,
+    required this.lotes,
+    required this.avaliacoes,
+  });
+
+  final PerfilDono perfil;
+  final List<ItemPub> itens;
+  final List<LoteMiniPub> lotes;
+  final List<AvaliacaoPub> avaliacoes;
+
+  factory PerfilPublico.fromJson(Map<String, dynamic> j) => PerfilPublico(
+        perfil: PerfilDono.fromJson(
+            Map<String, dynamic>.from(j['perfil'] as Map)),
+        itens: ((j['itens'] as List?) ?? const [])
+            .map((e) => ItemPub.fromJson(Map<String, dynamic>.from(e as Map)))
+            .toList(),
+        lotes: ((j['lotes'] as List?) ?? const [])
+            .map((e) =>
+                LoteMiniPub.fromJson(Map<String, dynamic>.from(e as Map)))
+            .toList(),
+        avaliacoes: ((j['avaliacoes'] as List?) ?? const [])
+            .map((e) =>
+                AvaliacaoPub.fromJson(Map<String, dynamic>.from(e as Map)))
+            .toList(),
       );
 }
 

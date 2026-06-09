@@ -8,6 +8,7 @@ import '../../shared/models/models.dart';
 import '../../shared/providers/data_providers.dart';
 import '../../shared/widgets/brl.dart';
 import '../negociacao/mesa_screen.dart';
+import '../perfil/perfil_publico_screen.dart';
 
 class DescobertaScreen extends ConsumerStatefulWidget {
   const DescobertaScreen({super.key});
@@ -426,13 +427,13 @@ class _DescobertaScreenState extends ConsumerState<DescobertaScreen> {
   }
 }
 
-class _LoteCard extends StatelessWidget {
+class _LoteCard extends ConsumerWidget {
   const _LoteCard({required this.lote, this.setor});
   final Lote lote;
   final Setor? setor;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final grad = setor != null
         ? AppColors.gradientFromHex(setor!.cor)
         : AppColors.gradHero;
@@ -536,38 +537,59 @@ class _LoteCard extends StatelessWidget {
             Row(
               children: [
                 if (lote.donoNome != null)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.22),
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
                       borderRadius: BorderRadius.circular(100),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          lote.donoNome!,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 12,
-                          ),
+                      onTap: lote.donoId == null
+                          ? null
+                          : () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                builder: (_) => PerfilPublicoScreen(
+                                  userId: lote.donoId!,
+                                  nomeFallback: lote.donoNome,
+                                ),
+                              ));
+                            },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.22),
+                          borderRadius: BorderRadius.circular(100),
                         ),
-                        if (lote.donoReputacao > 0) ...[
-                          const SizedBox(width: 6),
-                          const Icon(Icons.star_rounded,
-                              color: Colors.amberAccent, size: 13),
-                          const SizedBox(width: 2),
-                          Text(
-                            lote.donoReputacao.toStringAsFixed(1),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w800,
-                              fontSize: 12,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              lote.donoNome!,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 12,
+                              ),
                             ),
-                          ),
-                        ],
-                      ],
+                            if (lote.donoReputacao > 0) ...[
+                              const SizedBox(width: 6),
+                              const Icon(Icons.star_rounded,
+                                  color: Colors.amberAccent, size: 13),
+                              const SizedBox(width: 2),
+                              Text(
+                                lote.donoReputacao.toStringAsFixed(1),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                            const SizedBox(width: 4),
+                            Icon(Icons.arrow_forward_ios_rounded,
+                                color: Colors.white.withValues(alpha: 0.75),
+                                size: 10),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 const SizedBox(width: 8),
