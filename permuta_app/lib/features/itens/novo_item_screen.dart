@@ -9,6 +9,7 @@ import '../../core/http/api_client.dart';
 import '../../core/theme/app_theme.dart';
 import '../../shared/models/models.dart';
 import '../../shared/providers/data_providers.dart';
+import '../../shared/widgets/glass.dart';
 
 class NovoItemScreen extends ConsumerStatefulWidget {
   const NovoItemScreen({super.key});
@@ -121,7 +122,7 @@ class _NovoItemScreenState extends ConsumerState<NovoItemScreen> {
     final setores = ref.watch(setoresProvider);
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: GlassAppBar(
         title: const Text('Novo item'),
         leading: IconButton(
           icon: const Icon(Icons.close_rounded),

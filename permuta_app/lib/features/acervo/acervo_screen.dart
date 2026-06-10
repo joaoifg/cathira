@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../shared/widgets/glass.dart';
 import '../itens/meus_itens_screen.dart';
 import '../lotes/meus_lotes_screen.dart';
 
@@ -74,14 +75,14 @@ class _AcervoScreenState extends ConsumerState<AcervoScreen>
             ],
           ),
           const SizedBox(height: 12),
-          // Segmented control "lotes / itens".
-          Container(
+          // Segmented control "lotes / itens" — pílula glass.
+          GlassSurface(
+            radius: 18,
+            blur: 18,
+            opacity: 0.45,
+            tint: AppColors.surfaceAlt,
+            shadow: false,
             padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: AppColors.surfaceAlt,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.ink.withValues(alpha: 0.05)),
-            ),
             child: Row(
               children: [
                 _seg('Lotes', '📦', 0),
@@ -96,6 +97,15 @@ class _AcervoScreenState extends ConsumerState<AcervoScreen>
 
   Widget _seg(String label, String emoji, int idx) {
     final selected = _tab.index == idx;
+    final texto = Text(
+      label,
+      style: TextStyle(
+        fontWeight: FontWeight.w800,
+        fontSize: 13.5,
+        // Branco no selecionado: vira a base do GradientMask.
+        color: selected ? Colors.white : AppColors.muted,
+      ),
+    );
     return Expanded(
       child: GestureDetector(
         onTap: () => _tab.animateTo(idx),
@@ -105,7 +115,7 @@ class _AcervoScreenState extends ConsumerState<AcervoScreen>
           padding: const EdgeInsets.symmetric(vertical: 11),
           decoration: BoxDecoration(
             color: selected ? Colors.white : Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
             boxShadow: selected ? AppShadows.soft : null,
           ),
           child: Row(
@@ -113,14 +123,8 @@ class _AcervoScreenState extends ConsumerState<AcervoScreen>
             children: [
               Text(emoji, style: const TextStyle(fontSize: 14)),
               const SizedBox(width: 7),
-              Text(
-                label,
-                style: TextStyle(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 13.5,
-                  color: selected ? AppColors.ink : AppColors.muted,
-                ),
-              ),
+              // Label ativa ganha o gradiente da marca (igual à nav bar).
+              selected ? GradientMask(child: texto) : texto,
             ],
           ),
         ),

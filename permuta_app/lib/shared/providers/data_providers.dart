@@ -92,6 +92,17 @@ class NegociacaoDetalhe {
   final String meuLado; // 'a' ou 'b'
 }
 
+/// Interesses recebidos pendentes — itens meus que alguém curtiu e ainda
+/// preciso aceitar/recusar. Coração do funil item-first.
+final interessesRecebidosProvider =
+    FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  final dio = ref.watch(apiClientProvider);
+  final r = await dio.get('/interesses/recebidos');
+  return ((r.data as List?) ?? const [])
+      .map((e) => Map<String, dynamic>.from(e as Map))
+      .toList();
+});
+
 final descobertaItensProvider =
     FutureProvider.family<List<ItemDescoberta>, DescobertaQuery>((ref, q) async {
   final dio = ref.watch(apiClientProvider);

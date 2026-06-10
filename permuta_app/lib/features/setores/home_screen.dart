@@ -9,6 +9,7 @@ import '../../shared/models/models.dart';
 import '../../shared/providers/data_providers.dart';
 import '../../shared/widgets/brl.dart';
 import '../../shared/widgets/cathira_glyph.dart';
+import '../../shared/widgets/glass.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -113,14 +114,12 @@ class HomeScreen extends ConsumerWidget {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
-      child: Container(
+      child: GlassSurface(
+        radius: 20,
+        blur: 20,
+        opacity: 0.5,
+        tint: Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 18),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.ink.withValues(alpha: 0.06)),
-          boxShadow: AppShadows.soft,
-        ),
         child: IntrinsicHeight(
           child: Row(
             children: [
@@ -474,13 +473,14 @@ class _Saudacao extends ConsumerWidget {
                     .copyWith(fontWeight: FontWeight.w800, letterSpacing: 1.2),
               ),
               const Spacer(),
-              Container(
+              GlassSurface(
+                radius: 100,
+                blur: 12,
+                opacity: 0.4,
+                tint: Colors.white,
+                shadow: false,
                 padding: const EdgeInsets.symmetric(
                     horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: AppColors.ink.withValues(alpha: 0.06),
-                  borderRadius: BorderRadius.circular(100),
-                ),
                 child: Row(
                   children: [
                     Text(emoji, style: const TextStyle(fontSize: 13)),
@@ -659,10 +659,12 @@ class _HeroLoteCard extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
+                  // Scrim leve — quem garante a legibilidade agora é o
+                  // painel de vidro escuro embaixo.
                   colors: [
                     Colors.black.withValues(alpha: 0.05),
-                    Colors.black.withValues(alpha: 0.45),
-                    Colors.black.withValues(alpha: 0.78),
+                    Colors.black.withValues(alpha: 0.18),
+                    Colors.black.withValues(alpha: 0.38),
                   ],
                   stops: const [0.0, 0.5, 1.0],
                 ),
@@ -675,13 +677,7 @@ class _HeroLoteCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.25),
-                          borderRadius: BorderRadius.circular(100),
-                        ),
+                      GlassChip(
                         child: Text(
                           '${setor?.icone ?? "📦"} ${setor?.nome ?? lote.setorPrincipal}',
                           style: const TextStyle(
@@ -716,48 +712,61 @@ class _HeroLoteCard extends StatelessWidget {
                     ],
                   ),
                   const Spacer(),
-                  Text(
-                    lote.titulo,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTheme.display(28,
-                        color: Colors.white,
-                        weight: FontWeight.w700,
-                        letter: -1.2),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      if (lote.donoNome != null)
+                  // Painel inferior em vidro escuro — blur de verdade na foto.
+                  GlassChip(
+                    dark: true,
+                    radius: 18,
+                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
                         Text(
-                          'por ${lote.donoNome}',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.92),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          lote.titulo,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTheme.display(26,
+                              color: Colors.white,
+                              weight: FontWeight.w700,
+                              letter: -1.2),
                         ),
-                      if (lote.donoReputacao > 0) ...[
-                        const SizedBox(width: 6),
-                        const Icon(Icons.star_rounded,
-                            color: Colors.amberAccent, size: 14),
-                        Text(
-                          ' ${lote.donoReputacao.toStringAsFixed(1)}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w800,
-                          ),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            if (lote.donoNome != null)
+                              Text(
+                                'por ${lote.donoNome}',
+                                style: TextStyle(
+                                  color:
+                                      Colors.white.withValues(alpha: 0.92),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            if (lote.donoReputacao > 0) ...[
+                              const SizedBox(width: 6),
+                              const Icon(Icons.star_rounded,
+                                  color: Colors.amberAccent, size: 14),
+                              Text(
+                                ' ${lote.donoReputacao.toStringAsFixed(1)}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ],
+                            const Spacer(),
+                            Text(
+                              brl(lote.valorTotal),
+                              style: AppTheme.mono(20,
+                                  color: Colors.white,
+                                  weight: FontWeight.w700),
+                            ),
+                          ],
                         ),
                       ],
-                      const Spacer(),
-                      Text(
-                        brl(lote.valorTotal),
-                        style: AppTheme.mono(22,
-                            color: Colors.white,
-                            weight: FontWeight.w700),
-                      ),
-                    ],
+                    ),
                   ),
                 ],
               ),
@@ -775,64 +784,64 @@ class _MiniLoteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Foto ocupa o card inteiro; as infos moram numa barra de vidro escuro
+    // flutuando sobre ela.
     return Container(
       width: 180,
       decoration: BoxDecoration(
-        color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.ink.withValues(alpha: 0.06)),
         boxShadow: AppShadows.soft,
       ),
       clipBehavior: Clip.antiAlias,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
+        fit: StackFit.expand,
         children: [
-          AspectRatio(
-            aspectRatio: 16 / 10,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Container(
-                  color: AppColors.surfaceAlt,
-                ),
-                if (lote.capa != null && lote.capa!.isNotEmpty)
-                  Image.network(
-                    lote.capa!,
-                    fit: BoxFit.cover,
-                    gaplessPlayback: true,
-                    errorBuilder: (_, __, ___) =>
-                        const SizedBox.shrink(),
-                  ),
-              ],
+          Container(color: AppColors.surfaceAlt),
+          if (lote.capa != null && lote.capa!.isNotEmpty)
+            Image.network(
+              lote.capa!,
+              fit: BoxFit.cover,
+              gaplessPlayback: true,
+              errorBuilder: (_, __, ___) => const SizedBox.shrink(),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  lote.titulo,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w800, fontSize: 13),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  lote.donoNome ?? '—',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                      color: AppColors.muted, fontSize: 11),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  brl(lote.valorTotal),
-                  style: AppTheme.mono(15,
-                      color: AppColors.success, weight: FontWeight.w700),
-                ),
-              ],
+          Positioned(
+            left: 6,
+            right: 6,
+            bottom: 6,
+            child: GlassChip(
+              dark: true,
+              radius: 14,
+              padding: const EdgeInsets.fromLTRB(10, 8, 10, 9),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    lote.titulo,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 13),
+                  ),
+                  const SizedBox(height: 1),
+                  Text(
+                    lote.donoNome ?? '—',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.75),
+                        fontSize: 11),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    brl(lote.valorTotal),
+                    style: AppTheme.mono(14,
+                        color: Colors.white, weight: FontWeight.w700),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

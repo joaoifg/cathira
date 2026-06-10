@@ -108,7 +108,8 @@ type swipeItemReq struct {
 }
 
 // POST /swipes-itens — registra decisão de swipe sobre um item.
-// Quando like: futura rodada vai criar Mesa exploradora se for recíproco.
+// Quando 'like', também cria um interesse pendente que o dono pode aceitar
+// ou recusar pra abrir a Mesa exploradora.
 func (h *DescobertaItensHandler) Swipe(c *gin.Context) {
 	uid, _ := middleware.UserID(c)
 	var req swipeItemReq
@@ -118,7 +119,14 @@ func (h *DescobertaItensHandler) Swipe(c *gin.Context) {
 	}
 
 	ctx := c.Request.Context()
-	if _, err := h.db.Exec(ctx, `
+	tx, err := h.db.Begin(ctx)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer tx.Rollback(ctx)
+
+	if _, err := tx.Exec(ctx, `
 		insert into swipes_itens (from_id, to_item, decisao) values ($1,$2,$3)
 		on conflict (from_id, to_item) do update set decisao = excluded.decisao
 	`, uid, req.ToItem, req.Decisao); err != nil {
@@ -126,7 +134,42 @@ func (h *DescobertaItensHandler) Swipe(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"ok": true,
-	})
+	var interesseID *uuid.UUID
+	if req.Decisao == "like" {
+		// Cria interesse pendente endereçado ao dono do item.
+		var donoID uuid.UUID
+		if err := tx.QueryRow(ctx, `select dono_id from itens where id = $1`,
+			req.ToItem).Scan(&donoID); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		if donoID == uid {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "não dá pra curtir item próprio"})
+			return
+		}
+		var id uuid.UUID
+		err := tx.QueryRow(ctx, `
+			insert into interesses_itens (de_id, para_id, item_id) values ($1,$2,$3)
+			on conflict (de_id, item_id) do update set
+			  status = case when interesses_itens.status = 'recusado' then 'pendente' else interesses_itens.status end,
+			  resolvido_em = null
+			returning id
+		`, uid, donoID, req.ToItem).Scan(&id)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		interesseID = &id
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	resp := gin.H{"ok": true}
+	if interesseID != nil {
+		resp["interesse_id"] = interesseID
+	}
+	c.JSON(http.StatusOK, resp)
 }

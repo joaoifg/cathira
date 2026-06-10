@@ -5,6 +5,7 @@ import '../../core/http/api_client.dart';
 import '../../core/theme/app_theme.dart';
 import '../../shared/models/models.dart';
 import '../../shared/providers/data_providers.dart';
+import '../../shared/widgets/glass.dart';
 
 class NovoLoteScreen extends ConsumerStatefulWidget {
   const NovoLoteScreen({super.key});
@@ -63,7 +64,7 @@ class _NovoLoteScreenState extends ConsumerState<NovoLoteScreen> {
     final setores = ref.watch(setoresProvider);
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: GlassAppBar(
         title: const Text('Novo lote'),
         leading: IconButton(
           icon: const Icon(Icons.close_rounded),

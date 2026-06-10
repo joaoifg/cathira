@@ -7,6 +7,7 @@ import '../../core/theme/app_theme.dart';
 import '../../shared/models/models.dart';
 import '../../shared/providers/data_providers.dart';
 import '../../shared/widgets/brl.dart';
+import '../../shared/widgets/glass.dart';
 import '../negociacao/mesa_screen.dart';
 import '../perfil/perfil_publico_screen.dart';
 
@@ -53,7 +54,7 @@ class _DescobertaScreenState extends ConsumerState<DescobertaScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: GlassAppBar(
         title: const Text('Descobrir'),
         actions: [
           IconButton(
@@ -134,13 +135,13 @@ class _DescobertaScreenState extends ConsumerState<DescobertaScreen> {
   Widget _modoToggle() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
-      child: Container(
+      child: GlassSurface(
+        radius: 16,
+        blur: 18,
+        opacity: 0.45,
+        tint: AppColors.surfaceAlt,
+        shadow: false,
         padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          color: AppColors.surfaceAlt,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.ink.withValues(alpha: 0.05)),
-        ),
         child: Row(
           children: [
             _modoBtn('📦', 'Por lote', _ModoDescoberta.lote),
@@ -153,6 +154,15 @@ class _DescobertaScreenState extends ConsumerState<DescobertaScreen> {
 
   Widget _modoBtn(String emoji, String label, _ModoDescoberta modo) {
     final sel = _modo == modo;
+    final texto = Text(
+      label,
+      style: TextStyle(
+        fontWeight: FontWeight.w800,
+        fontSize: 12.5,
+        // Branco no selecionado: vira a base do GradientMask.
+        color: sel ? Colors.white : AppColors.muted,
+      ),
+    );
     return Expanded(
       child: GestureDetector(
         onTap: () => setState(() {
@@ -166,7 +176,7 @@ class _DescobertaScreenState extends ConsumerState<DescobertaScreen> {
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
             color: sel ? Colors.white : Colors.transparent,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(12),
             boxShadow: sel ? AppShadows.soft : null,
           ),
           child: Row(
@@ -174,14 +184,7 @@ class _DescobertaScreenState extends ConsumerState<DescobertaScreen> {
             children: [
               Text(emoji, style: const TextStyle(fontSize: 14)),
               const SizedBox(width: 7),
-              Text(
-                label,
-                style: TextStyle(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 12.5,
-                  color: sel ? AppColors.ink : AppColors.muted,
-                ),
-              ),
+              sel ? GradientMask(child: texto) : texto,
             ],
           ),
         ),
@@ -636,13 +639,7 @@ class _LoteCard extends ConsumerWidget {
                       Text(setor?.icone ?? '📦',
                     style: const TextStyle(fontSize: 44)),
                 const Spacer(),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.25),
-                    borderRadius: BorderRadius.circular(100),
-                  ),
+                GlassChip(
                   child: Text(
                     setor?.nome ?? lote.setorPrincipal,
                     style: const TextStyle(
@@ -712,13 +709,9 @@ class _LoteCard extends ConsumerWidget {
                                 ),
                               ));
                             },
-                      child: Container(
+                      child: GlassChip(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.22),
-                          borderRadius: BorderRadius.circular(100),
-                        ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -785,12 +778,9 @@ class _LoteCard extends ConsumerWidget {
                 ),
               ),
             const SizedBox(height: 20),
-            Container(
+            GlassChip(
+              radius: 16,
               padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.18),
-                borderRadius: BorderRadius.circular(16),
-              ),
               child: Row(
                 children: [
                   Expanded(
@@ -1163,13 +1153,9 @@ class _ItemDescobertaCard extends StatelessWidget {
                           );
                         },
                         borderRadius: BorderRadius.circular(100),
-                        child: Container(
+                        child: GlassChip(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.22),
-                            borderRadius: BorderRadius.circular(100),
-                          ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [

@@ -6,6 +6,7 @@ import '../../core/theme/app_theme.dart';
 import '../../shared/models/models.dart';
 import '../../shared/providers/data_providers.dart';
 import '../../shared/widgets/brl.dart';
+import '../../shared/widgets/glass.dart';
 
 class LoteDetalheScreen extends ConsumerWidget {
   const LoteDetalheScreen({super.key, required this.loteId});
@@ -18,7 +19,8 @@ class LoteDetalheScreen extends ConsumerWidget {
     final meusItens = ref.watch(meusItensProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Lote')),
+      extendBodyBehindAppBar: true,
+      appBar: GlassAppBar(title: const Text('Lote')),
       body: detalhe.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Erro: $e')),
@@ -34,12 +36,14 @@ class LoteDetalheScreen extends ConsumerWidget {
               .toList();
 
           return RefreshIndicator(
+            edgeOffset: GlassAppBar.alturaTotal(context),
             onRefresh: () async {
               ref.invalidate(loteDetalheProvider(loteId));
               ref.invalidate(meusItensProvider);
             },
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 80),
+              padding: EdgeInsets.fromLTRB(
+                  20, GlassAppBar.alturaTotal(context) + 20, 20, 80),
               children: [
                 _header(lote, setor),
                 const SizedBox(height: 20),

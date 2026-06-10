@@ -10,6 +10,7 @@ import '../../core/theme/app_theme.dart';
 import '../../shared/models/models.dart';
 import '../../shared/providers/data_providers.dart';
 import '../../shared/widgets/brl.dart';
+import '../../shared/widgets/glass.dart';
 import '../auth/dev_auth.dart';
 
 class MesaScreen extends ConsumerStatefulWidget {
@@ -157,7 +158,7 @@ class _MesaScreenState extends ConsumerState<MesaScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.surfaceAlt,
-      appBar: AppBar(
+      appBar: GlassAppBar(
         title: const Text('Mesa de negociação'),
         actions: [
           IconButton(
@@ -661,22 +662,10 @@ class _ChatSheetState extends ConsumerState<_ChatSheet> {
       minChildSize: 0.4,
       maxChildSize: 0.95,
       expand: false,
-      builder: (_, controller) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-        ),
+      builder: (_, controller) => GlassSheet(
         child: Column(
           children: [
-            const SizedBox(height: 8),
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(100),
-              ),
-            ),
+            GlassSheet.handle(),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 14, 20, 8),
               child: Row(

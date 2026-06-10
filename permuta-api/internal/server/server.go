@@ -110,6 +110,11 @@ func New(ctx context.Context, cfg config.Config) (*App, error) {
 		api.GET("/descoberta/itens", descItensH.Feed)
 		api.POST("/swipes-itens", descItensH.Swipe)
 
+		intH := handler.NewInteressesHandler(pool)
+		api.GET("/interesses/recebidos", intH.Recebidos)
+		api.POST("/interesses/:id/aceitar", intH.Aceitar)
+		api.POST("/interesses/:id/recusar", intH.Recusar)
+
 		if cfg.DevMode {
 			seedH := handler.NewSeedHandler(pool, cfg)
 			api.POST("/dev/seed", seedH.Run)

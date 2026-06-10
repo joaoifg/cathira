@@ -7,6 +7,7 @@ import '../../core/supabase/supabase_providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../auth/dev_auth.dart';
 import '../../shared/providers/data_providers.dart';
+import '../../shared/widgets/glass.dart';
 
 class _PersonaChip extends ConsumerWidget {
   const _PersonaChip({required this.nome, required this.email, required this.emoji});
@@ -102,9 +103,11 @@ class _PerfilScreenState extends ConsumerState<PerfilScreen> {
     final email = dev?.email ?? user?.email ?? '—';
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Perfil')),
+      extendBodyBehindAppBar: true,
+      appBar: GlassAppBar(title: const Text('Perfil')),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+        padding: EdgeInsets.fromLTRB(
+            20, GlassAppBar.alturaTotal(context) + 16, 20, 32),
         children: [
           Container(
             padding: const EdgeInsets.all(20),

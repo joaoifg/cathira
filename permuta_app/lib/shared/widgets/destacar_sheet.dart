@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/http/api_client.dart';
 import '../../core/theme/app_theme.dart';
+import 'glass.dart';
 
 /// Bottom sheet pra destacar item ou lote. Mostra 3 planos de duração
 /// (30/60/180 dias) com preços fixos. Confirma → chama POST destacar
@@ -88,25 +89,12 @@ class _DestacarSheetState extends ConsumerState<DestacarSheet> {
       minChildSize: 0.4,
       maxChildSize: 0.95,
       expand: false,
-      builder: (_, ctrl) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-        ),
+      builder: (_, ctrl) => GlassSheet(
         child: ListView(
           controller: ctrl,
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 30),
           children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(100),
-                ),
-              ),
-            ),
+            GlassSheet.handle(),
             const SizedBox(height: 18),
             // Hero
             Container(
@@ -219,7 +207,8 @@ class _DestacarSheetState extends ConsumerState<DestacarSheet> {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: sel ? AppColors.ink : Colors.white,
+          // Não-selecionado é translúcido pra deixar o vidro do sheet respirar.
+          color: sel ? AppColors.ink : Colors.white.withValues(alpha: 0.55),
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
             color: sel ? Colors.transparent : AppColors.ink.withValues(alpha: 0.08),
