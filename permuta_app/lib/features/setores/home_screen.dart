@@ -34,13 +34,12 @@ class HomeScreen extends ConsumerWidget {
           child: CustomScrollView(
             slivers: [
               SliverToBoxAdapter(child: _Saudacao(ref: ref)),
-              SliverToBoxAdapter(
-                  child: _quickStats(meusLotes, negociacoes, descoberta)),
-              SliverToBoxAdapter(child: const SizedBox(height: 28)),
+              SliverToBoxAdapter(child: const SizedBox(height: 18)),
+              // Vitrine: lote em destaque (foto grande) logo no topo.
               SliverToBoxAdapter(
                 child: _SectionTitle(
-                  titulo: 'Destaque agora',
-                  subtitulo: 'Algo do seu nível pra você dar um like',
+                  titulo: 'Em destaque',
+                  subtitulo: 'Um lote do seu nível pra dar like',
                   action: 'Ver tudo →',
                   onAction: () => ref
                       .read(currentTabProvider.notifier)
@@ -48,7 +47,10 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
               SliverToBoxAdapter(child: _heroLote(context, ref, descoberta)),
-              SliverToBoxAdapter(child: const SizedBox(height: 32)),
+              SliverToBoxAdapter(child: const SizedBox(height: 20)),
+              SliverToBoxAdapter(
+                  child: _quickStats(meusLotes, negociacoes, descoberta)),
+              SliverToBoxAdapter(child: const SizedBox(height: 26)),
               SliverToBoxAdapter(
                 child: _SectionTitle(
                   titulo: 'Em alta',
@@ -56,7 +58,7 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
               SliverToBoxAdapter(child: _carrossel(context, descoberta)),
-              SliverToBoxAdapter(child: const SizedBox(height: 32)),
+              SliverToBoxAdapter(child: const SizedBox(height: 30)),
               SliverToBoxAdapter(
                 child: _SectionTitle(
                   titulo: 'Explorar por setor',
@@ -90,7 +92,7 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
               SliverToBoxAdapter(child: _comoFunciona(context)),
-              SliverToBoxAdapter(child: const SizedBox(height: 24)),
+              SliverToBoxAdapter(child: const SizedBox(height: 120)),
             ],
           ),
         ),
@@ -273,71 +275,9 @@ class HomeScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 4, 20, 4),
-          child: Row(
-            children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.ink,
-                  borderRadius: BorderRadius.circular(100),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 5,
-                      height: 5,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.accent,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      'COMO FUNCIONA',
-                      style: AppTheme.mono(9, color: Colors.white)
-                          .copyWith(
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1.6),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Container(
-                  height: 1,
-                  color: AppColors.ink.withValues(alpha: 0.1),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 8),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
-          child: RichText(
-            text: TextSpan(
-              style: AppTheme.display(28,
-                  color: AppColors.ink,
-                  weight: FontWeight.w700,
-                  letter: -1.4),
-              children: [
-                const TextSpan(text: 'quatro passos.\n'),
-                TextSpan(
-                  text: 'sem mistério.',
-                  style: TextStyle(
-                    foreground: Paint()
-                      ..shader = const LinearGradient(
-                        colors: [Color(0xFFF43F5E), Color(0xFFFB923C)],
-                      ).createShader(const Rect.fromLTWH(0, 0, 280, 50)),
-                  ),
-                ),
-              ],
-            ),
-          ),
+        const _SectionTitle(
+          titulo: 'Como funciona',
+          subtitulo: 'Quatro passos, sem mistério',
         ),
         SizedBox(
           height: 200,
@@ -506,7 +446,7 @@ class _Saudacao extends ConsumerWidget {
                 : 'boa noite';
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -559,82 +499,24 @@ class _Saudacao extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: 28),
-          // Manchete centralizada com fundo geométrico.
-          Center(
-            child: Stack(
-              alignment: Alignment.center,
+          const SizedBox(height: 20),
+          // Manchete compacta — dá personalidade sem dominar a tela.
+          RichText(
+            text: TextSpan(
+              style: AppTheme.display(36,
+                  weight: FontWeight.w700, letter: -1.6, height: 0.94),
               children: [
-                // Anel decorativo atrás do texto.
-                Container(
-                  width: 220,
-                  height: 220,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        AppColors.primary.withValues(alpha: 0.12),
-                        AppColors.accent.withValues(alpha: 0.04),
-                        Colors.transparent,
-                      ],
-                      stops: const [0.0, 0.6, 1.0],
-                    ),
+                const TextSpan(text: 'o que vamos\n'),
+                TextSpan(
+                  text: 'trocar',
+                  style: TextStyle(
+                    foreground: Paint()
+                      ..shader = const LinearGradient(
+                        colors: [Color(0xFFF43F5E), Color(0xFFFB923C)],
+                      ).createShader(const Rect.fromLTWH(0, 0, 220, 44)),
                   ),
                 ),
-                Column(
-                  children: [
-                    // Eyebrow pequeno acima.
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AppColors.ink,
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.bolt_rounded,
-                              color: AppColors.accent, size: 12),
-                          const SizedBox(width: 4),
-                          Text(
-                            'TORNA AUTOMÁTICA',
-                            style: AppTheme.mono(9, color: Colors.white)
-                                .copyWith(
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 1.6),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    // Manchete centralizada com gradient na 2ª linha.
-                    RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        style: AppTheme.display(44,
-                            weight: FontWeight.w700, letter: -2.0, height: 0.95),
-                        children: [
-                          const TextSpan(text: 'monta o lote.\n'),
-                          TextSpan(
-                            text: 'a torna',
-                            style: TextStyle(
-                              foreground: Paint()
-                                ..shader = const LinearGradient(
-                                  colors: [
-                                    Color(0xFFF43F5E),
-                                    Color(0xFFFB923C),
-                                  ],
-                                ).createShader(
-                                    const Rect.fromLTWH(0, 0, 240, 50)),
-                            ),
-                          ),
-                          const TextSpan(text: ' resolve\nsozinha.'),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                const TextSpan(text: ' hoje?'),
               ],
             ),
           ),

@@ -106,6 +106,10 @@ func New(ctx context.Context, cfg config.Config) (*App, error) {
 		api.POST("/itens/:id/destacar", destH.DestacarItem)
 		api.POST("/lotes/:id/destacar", destH.DestacarLote)
 
+		descItensH := handler.NewDescobertaItensHandler(pool)
+		api.GET("/descoberta/itens", descItensH.Feed)
+		api.POST("/swipes-itens", descItensH.Swipe)
+
 		if cfg.DevMode {
 			seedH := handler.NewSeedHandler(pool, cfg)
 			api.POST("/dev/seed", seedH.Run)

@@ -92,6 +92,19 @@ class NegociacaoDetalhe {
   final String meuLado; // 'a' ou 'b'
 }
 
+final descobertaItensProvider =
+    FutureProvider.family<List<ItemDescoberta>, DescobertaQuery>((ref, q) async {
+  final dio = ref.watch(apiClientProvider);
+  final r = await dio.get('/descoberta/itens', queryParameters: {
+    if (q.setor != null && q.setor!.isNotEmpty) 'setor': q.setor,
+    if (q.cidade != null && q.cidade!.isNotEmpty) 'cidade': q.cidade,
+    'limit': 30,
+  });
+  return ((r.data as List?) ?? const [])
+      .map((e) => ItemDescoberta.fromJson(Map<String, dynamic>.from(e as Map)))
+      .toList();
+});
+
 final perfilPublicoProvider =
     FutureProvider.family<PerfilPublico, String>((ref, userId) async {
   final dio = ref.watch(apiClientProvider);

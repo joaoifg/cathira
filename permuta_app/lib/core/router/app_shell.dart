@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,6 +8,7 @@ import '../../features/acervo/acervo_screen.dart';
 import '../../features/negociacao/negociacoes_screen.dart';
 import '../../features/perfil/perfil_screen.dart';
 import '../../shared/providers/data_providers.dart';
+import '../../shared/widgets/glass.dart';
 import 'nav_providers.dart';
 
 class AppShell extends ConsumerWidget {
@@ -44,8 +43,9 @@ class AppShell extends ConsumerWidget {
   }
 }
 
-/// Barra flutuante "glass": translúcida com blur, cantos arredondados,
-/// flutua acima do conteúdo. A aba ativa vira uma pílula com gradiente + label.
+/// Barra flutuante "totalmente glass" estilo Tinder/iOS: vidro translúcido puro
+/// (deixa o conteúdo vazar por trás), sem pílula sólida. A aba ativa é o próprio
+/// ícone pintado com o gradiente da marca + um ponto-indicador abaixo.
 class _GlassNav extends StatelessWidget {
   const _GlassNav({
     required this.index,
@@ -74,41 +74,23 @@ class _GlassNav extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(26),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
-              decoration: BoxDecoration(
-                color: AppColors.surface.withValues(alpha: 0.82),
-                borderRadius: BorderRadius.circular(26),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.6)),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.ink.withValues(alpha: 0.12),
-                    blurRadius: 28,
-                    offset: const Offset(0, 12),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: List.generate(items.length, (i) {
-                  final it = items[i];
-                  final selected = i == index;
-                  final badge =
-                      i == _negociosIdx && pendentes > 0 ? pendentes : 0;
-                  return _GlassNavButton(
-                    item: it,
-                    selected: selected,
-                    badge: badge,
-                    onTap: () => onTap(i),
-                  );
-                }),
-              ),
-            ),
+        padding: const EdgeInsets.fromLTRB(18, 0, 18, 12),
+        child: GlassSurface(
+          radius: 30,
+          blur: 24,
+          opacity: 0.58,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: List.generate(items.length, (i) {
+              final badge = i == _negociosIdx && pendentes > 0 ? pendentes : 0;
+              return _GlassNavButton(
+                item: items[i],
+                selected: i == index,
+                badge: badge,
+                onTap: () => onTap(i),
+              );
+            }),
           ),
         ),
       ),
@@ -131,49 +113,33 @@ class _GlassNavButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Flexible(
+    final icon = AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: Icon(
+        selected ? item.activeIcon : item.icon,
+        key: ValueKey(selected),
+        color: selected ? Colors.white : AppColors.muted,
+        size: 25,
+      ),
+    );
+
+    return Expanded(
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 240),
-          curve: Curves.easeOutCubic,
-          margin: const EdgeInsets.symmetric(horizontal: 2),
-          padding: EdgeInsets.symmetric(
-            horizontal: selected ? 14 : 10,
-            vertical: 10,
-          ),
-          decoration: BoxDecoration(
-            gradient: selected ? AppColors.gradHero : null,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: selected
-                ? [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.35),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
-                    ),
-                  ]
-                : null,
-          ),
-          child: Row(
+        borderRadius: BorderRadius.circular(18),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 180),
-                    child: Icon(
-                      selected ? item.activeIcon : item.icon,
-                      key: ValueKey(selected),
-                      color: selected ? Colors.white : AppColors.muted,
-                      size: 23,
-                    ),
-                  ),
+                  // Ícone ativo vira gradiente (truque do Tinder); inativo fica muted.
+                  selected ? GradientMask(child: icon) : icon,
                   if (badge > 0)
                     Positioned(
-                      right: -8,
+                      right: -9,
                       top: -5,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
@@ -182,41 +148,42 @@ class _GlassNavButton extends StatelessWidget {
                           color: AppColors.accent,
                           borderRadius: BorderRadius.circular(100),
                           border:
-                              Border.all(color: AppColors.surface, width: 2),
+                              Border.all(color: Colors.white, width: 1.5),
                         ),
                         constraints: const BoxConstraints(
-                            minWidth: 18, minHeight: 18),
+                            minWidth: 17, minHeight: 17),
                         child: Text(
                           '$badge',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 10,
+                            fontSize: 9.5,
                             fontWeight: FontWeight.w800,
-                            height: 1.1,
+                            height: 1.2,
                           ),
                         ),
                       ),
                     ),
                 ],
               ),
-              // Label só na aba ativa, com transição suave de largura.
-              AnimatedSize(
-                duration: const Duration(milliseconds: 220),
+              const SizedBox(height: 5),
+              // Label sempre presente, discreta — ativa ganha gradiente.
+              selected
+                  ? GradientMask(
+                      child: Text(item.label, style: _labelStyle(true)),
+                    )
+                  : Text(item.label, style: _labelStyle(false)),
+              const SizedBox(height: 4),
+              // Ponto-indicador: gradiente quando ativo, transparente quando não.
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 240),
                 curve: Curves.easeOutCubic,
-                child: selected
-                    ? Padding(
-                        padding: const EdgeInsets.only(left: 8),
-                        child: Text(
-                          item.label,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 12.5,
-                          ),
-                        ),
-                      )
-                    : const SizedBox.shrink(),
+                width: selected ? 5 : 0,
+                height: 5,
+                decoration: const BoxDecoration(
+                  gradient: AppColors.gradHero,
+                  shape: BoxShape.circle,
+                ),
               ),
             ],
           ),
@@ -224,6 +191,13 @@ class _GlassNavButton extends StatelessWidget {
       ),
     );
   }
+
+  TextStyle _labelStyle(bool selected) => TextStyle(
+        color: selected ? Colors.white : AppColors.muted,
+        fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+        fontSize: 10.5,
+        letterSpacing: 0.1,
+      );
 }
 
 class _NavItem {

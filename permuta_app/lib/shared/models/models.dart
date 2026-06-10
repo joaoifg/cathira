@@ -327,6 +327,61 @@ class AvaliacaoPub {
       );
 }
 
+/// Item retornado pelo feed de descoberta por item. Inclui info do dono
+/// pra renderizar o card sem precisar de query adicional.
+class ItemDescoberta {
+  ItemDescoberta({
+    required this.id,
+    required this.titulo,
+    required this.setorSlug,
+    required this.categoria,
+    required this.valorReferencia,
+    required this.fotos,
+    required this.donoId,
+    required this.donoNome,
+    this.descricao,
+    this.loteId,
+    this.loteTitulo,
+    this.donoCidade,
+    this.donoReputacao = 0,
+    this.emDestaque = false,
+  });
+
+  final String id;
+  final String titulo;
+  final String? descricao;
+  final List<String> fotos;
+  final String setorSlug;
+  final String categoria;
+  final double valorReferencia;
+  final String? loteId;
+  final String? loteTitulo;
+  final String donoId;
+  final String donoNome;
+  final String? donoCidade;
+  final double donoReputacao;
+  final bool emDestaque;
+
+  factory ItemDescoberta.fromJson(Map<String, dynamic> j) => ItemDescoberta(
+        id: j['id'] as String,
+        titulo: j['titulo'] as String,
+        descricao: j['descricao'] as String?,
+        fotos: ((j['fotos'] as List?) ?? const [])
+            .map((e) => e.toString())
+            .toList(),
+        setorSlug: j['setor_slug'] as String,
+        categoria: j['categoria'] as String,
+        valorReferencia: (j['valor_referencia'] as num?)?.toDouble() ?? 0,
+        loteId: j['lote_id'] as String?,
+        loteTitulo: j['lote_titulo'] as String?,
+        donoId: j['dono_id'] as String,
+        donoNome: j['dono_nome'] as String? ?? '—',
+        donoCidade: j['dono_cidade'] as String?,
+        donoReputacao: (j['dono_reputacao'] as num?)?.toDouble() ?? 0,
+        emDestaque: j['em_destaque'] as bool? ?? false,
+      );
+}
+
 class PerfilPublico {
   PerfilPublico({
     required this.perfil,

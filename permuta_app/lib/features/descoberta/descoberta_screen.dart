@@ -17,11 +17,15 @@ class DescobertaScreen extends ConsumerStatefulWidget {
   ConsumerState<DescobertaScreen> createState() => _DescobertaScreenState();
 }
 
+enum _ModoDescoberta { lote, item }
+
 class _DescobertaScreenState extends ConsumerState<DescobertaScreen> {
   String? _setor;
   String _cidade = '';
   String? _meuLoteId;
   int _cursor = 0;
+  int _cursorItem = 0;
+  _ModoDescoberta _modo = _ModoDescoberta.lote;
 
   @override
   Widget build(BuildContext context) {
@@ -102,24 +106,152 @@ class _DescobertaScreenState extends ConsumerState<DescobertaScreen> {
           ),
         ],
       ),
-      body: lotesPossiveis.isEmpty
-          ? _semLote()
-          : Column(
-              children: [
-                _seletorMeuLote(lotesPossiveis),
-                if (_cidade.isNotEmpty) _chipCidadeAtiva(),
-                _filtroSetores(setores.value ?? const []),
-                Expanded(
-                  child: feed.when(
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()),
-                    error: (e, _) => Center(child: Text('Erro: $e')),
-                    data: (data) => _buildDeck(data, setores.value ?? const []),
-                  ),
-                ),
-              ],
-            ),
+      body: Column(
+        children: [
+          _modoToggle(),
+          if (_modo == _ModoDescoberta.lote && lotesPossiveis.isNotEmpty)
+            _seletorMeuLote(lotesPossiveis),
+          if (_cidade.isNotEmpty) _chipCidadeAtiva(),
+          _filtroSetores(setores.value ?? const []),
+          Expanded(
+            child: _modo == _ModoDescoberta.lote
+                ? (lotesPossiveis.isEmpty
+                    ? _semLote()
+                    : feed.when(
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (e, _) => Center(child: Text('Erro: $e')),
+                        data: (data) =>
+                            _buildDeck(data, setores.value ?? const []),
+                      ))
+                : _deckItens(setores.value ?? const []),
+          ),
+        ],
+      ),
     );
+  }
+
+  Widget _modoToggle() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
+      child: Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceAlt,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.ink.withValues(alpha: 0.05)),
+        ),
+        child: Row(
+          children: [
+            _modoBtn('📦', 'Por lote', _ModoDescoberta.lote),
+            _modoBtn('🧰', 'Por item', _ModoDescoberta.item),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _modoBtn(String emoji, String label, _ModoDescoberta modo) {
+    final sel = _modo == modo;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() {
+          _modo = modo;
+          _cursor = 0;
+          _cursorItem = 0;
+        }),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: sel ? Colors.white : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: sel ? AppShadows.soft : null,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(emoji, style: const TextStyle(fontSize: 14)),
+              const SizedBox(width: 7),
+              Text(
+                label,
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 12.5,
+                  color: sel ? AppColors.ink : AppColors.muted,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _deckItens(List<Setor> setores) {
+    final q = DescobertaQuery(setor: _setor, cidade: _cidade);
+    final feed = ref.watch(descobertaItensProvider(q));
+    final setMap = {for (final s in setores) s.slug: s};
+
+    return feed.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Erro: $e')),
+      data: (data) {
+        if (data.isEmpty) return _emptyFeed();
+        if (_cursorItem >= data.length) {
+          return _semMaisCards();
+        }
+        final atual = data[_cursorItem];
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+          child: Column(
+            children: [
+              Expanded(
+                child: _ItemDescobertaCard(
+                    item: atual, setor: setMap[atual.setorSlug]),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _bigBtn(Icons.close_rounded, Colors.white, AppColors.ink,
+                      () => _swipeItem(atual, 'pass')),
+                  _bigBtn(Icons.favorite_rounded, AppColors.primary,
+                      Colors.white, () => _swipeItem(atual, 'like')),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _swipeItem(ItemDescoberta it, String decisao) async {
+    final dio = ref.read(apiClientProvider);
+    try {
+      await dio.post('/swipes-itens', data: {
+        'to_item': it.id,
+        'decisao': decisao,
+      });
+      if (decisao == 'like' && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('💌 Interesse enviado pra ${it.donoNome}'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Falhou: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _cursorItem++);
+    }
   }
 
   Widget _semLote() => Center(
@@ -860,6 +992,231 @@ class _SwipeStackState extends State<_SwipeStack>
               letterSpacing: 2,
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Card de item individual (modo "Por item" da descoberta). Foto grande,
+/// chip do setor, info do dono clicável, badge "DESTAQUE" se ativo.
+class _ItemDescobertaCard extends StatelessWidget {
+  const _ItemDescobertaCard({required this.item, this.setor});
+  final ItemDescoberta item;
+  final Setor? setor;
+
+  @override
+  Widget build(BuildContext context) {
+    final grad = setor != null
+        ? AppColors.gradientFromHex(setor!.cor)
+        : AppColors.gradHero;
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.18),
+            blurRadius: 30,
+            offset: const Offset(0, 16),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            DecoratedBox(decoration: BoxDecoration(gradient: grad)),
+            if (item.fotos.isNotEmpty)
+              Image.network(
+                item.fotos.first,
+                fit: BoxFit.cover,
+                gaplessPlayback: true,
+                errorBuilder: (_, __, ___) =>
+                    DecoratedBox(decoration: BoxDecoration(gradient: grad)),
+                loadingBuilder: (ctx, child, prog) => prog == null
+                    ? child
+                    : DecoratedBox(
+                        decoration: BoxDecoration(gradient: grad),
+                        child: const Center(
+                          child: SizedBox(
+                            width: 28,
+                            height: 28,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ),
+                      ),
+              ),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.28),
+                    Colors.black.withValues(alpha: 0.10),
+                    Colors.black.withValues(alpha: 0.72),
+                  ],
+                  stops: const [0.0, 0.45, 1.0],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.92),
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: Text(
+                          '${setor?.icone ?? "📦"} ${setor?.nome ?? item.setorSlug} · ${item.categoria}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      if (item.emDestaque)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [
+                                AppColors.accent,
+                                AppColors.primary
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                  Icons.local_fire_department_rounded,
+                                  color: Colors.white,
+                                  size: 13),
+                              const SizedBox(width: 4),
+                              Text(
+                                'DESTAQUE',
+                                style:
+                                    AppTheme.mono(10, color: Colors.white)
+                                        .copyWith(
+                                            fontWeight: FontWeight.w800,
+                                            letterSpacing: 1.4),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                  const Spacer(),
+                  Text(
+                    item.titulo,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 30,
+                      height: 1.05,
+                      letterSpacing: -0.6,
+                    ),
+                  ),
+                  if (item.descricao != null && item.descricao!.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Text(
+                        item.descricao!,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.88),
+                          fontSize: 13,
+                          height: 1.35,
+                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => PerfilPublicoScreen(
+                                userId: item.donoId,
+                                nomeFallback: item.donoNome,
+                              ),
+                            ),
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(100),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.22),
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                item.donoNome,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              if (item.donoReputacao > 0) ...[
+                                const SizedBox(width: 6),
+                                const Icon(Icons.star_rounded,
+                                    color: Colors.amberAccent, size: 13),
+                                const SizedBox(width: 2),
+                                Text(
+                                  item.donoReputacao.toStringAsFixed(1),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                              const SizedBox(width: 4),
+                              Icon(Icons.arrow_forward_ios_rounded,
+                                  color:
+                                      Colors.white.withValues(alpha: 0.75),
+                                  size: 10),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        brl(item.valorReferencia),
+                        style: AppTheme.mono(22,
+                            color: Colors.white,
+                            weight: FontWeight.w700),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
